@@ -35,7 +35,7 @@ public class ToDoItemsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult Read() // GET: /api/ToDoItems
+    public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read() // GET: /api/ToDoItems
     {
         try
         {
@@ -110,6 +110,10 @@ public class ToDoItemsController : ControllerBase
         {
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
+    }
+    public void AddItemToStorage(ToDoItem item)
+    {
+        items.Add(item);
     }
 }
 
