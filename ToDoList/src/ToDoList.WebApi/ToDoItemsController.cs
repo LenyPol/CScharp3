@@ -5,73 +5,106 @@ using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 using System.Linq;
 
-[Route("api/[controller]")] //localhost:5000/api/ToDoItems
+/// <summary>
+/// Controller pro správu ToDo položek.
+/// localhost:5000/api/ToDoItems
+/// </summary>
+[Route("api/[controller]")]
 [ApiController]
 
 public class ToDoItemsController : ControllerBase
 {
     private static readonly List<ToDoItem> items = [];
 
+    /// <summary>
+    /// Vytvoří nový ToDoItem na základě dat z požadavku.
+    /// </summary>
+    /// <param name="request">DTO objekt s údaji o úkolu k vytvoření.</param>
+    /// <returns>
+    /// Vrací <see cref="CreatedAtActionResult"/> s vytvořeným objektem (HTTP 201),
+    /// nebo chybu 500 při selhání.
+    /// </returns>
     [HttpPost]
-    public IActionResult Create([FromBody] ToDoItemCreateRequestDto request) // DTO - Data Transfer Object
+    public IActionResult Create([FromBody] ToDoItemCreateRequestDto request)
     {
         var item = request.ToDomain();
 
         try
         {
-            item.ToDoItemId = items.Count == 0 ? 1 : items.Max(o => o.ToDoItemId) + 1; // vygenerování nového ID
-            items.Add(item);// přidání
+            item.ToDoItemId = items.Count == 0 ? 1 : items.Max(o => o.ToDoItemId) + 1;
+            items.Add(item);
         }
         catch (Exception ex)
         {
-            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError); //500 s chybovou hláškou
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
-        // odpověď klientovi 201 Created, Location header, objekt
+
         return CreatedAtAction(
             nameof(ReadById),
             new { toDoItemId = item.ToDoItemId },
             ToDoItemGetResponseDto.FromDomain(item)
         );
     }
-
+    /// <summary>
+    /// Vrátí všechny uložené ToDo položky.
+    /// </summary>
+    /// <returns>
+    /// Vrací <see cref="OkObjectResult"/> (HTTP 200) s kolekcí položek,
+    /// nebo <see cref="NotFoundResult"/>, pokud seznam neexistuje.
+    /// </returns>
     [HttpGet]
-    public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read() // GET: /api/ToDoItems
+    public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
     {
         try
         {
-            if (items == null) // kontrola, zda list je
-                return NotFound();// 404 pokud ne
+            if (items == null)
+                return NotFound();
 
-            var response = items // převedení na DTO objekty
+            var response = items
                 .Select(ToDoItemGetResponseDto.FromDomain)
                 .ToList();
 
-            return Ok(response);// 200
+            return Ok(response);
         }
         catch (Exception ex)
         {
-            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError); // 500
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
     }
-
+    /// <summary>
+    /// Vrátí jednu ToDo položku podle jejího ID.
+    /// </summary>
+    /// <param name="toDoItemId">ID položky, kterou chceme načíst.</param>
+    /// <returns>
+    /// Vrací <see cref="OkObjectResult"/> (HTTP 200) s položkou,
+    /// nebo <see cref="NotFoundResult"/>, pokud neexistuje.
+    /// </returns>
     [HttpGet("{toDoItemId:int}")]
-    public IActionResult ReadById(int toDoItemId) // api/ToDoItems/<id>
+    public IActionResult ReadById(int toDoItemId)
     {
         try
         {
-            var item = items.Find(i => i.ToDoItemId == toDoItemId); // vrací úrvek splňující predikát, nebo null
+            var item = items.Find(i => i.ToDoItemId == toDoItemId);
 
             if (item is null)
-                return NotFound();//404
+                return NotFound();
 
-            return Ok(ToDoItemGetResponseDto.FromDomain(item));// vracíme DTO
+            return Ok(ToDoItemGetResponseDto.FromDomain(item));
         }
         catch (Exception ex)
         {
-            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);//500
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
     }
-
+    /// <summary>
+    /// Aktualizuje ToDo položku podle ID.
+    /// </summary>
+    /// <param name="toDoItemId">ID položky, kterou chceme aktualizovat.</param>
+    /// <param name="request">DTO objekt s novými daty položky.</param>
+    /// <returns>
+    /// Vrací <see cref="NoContentResult"/> (HTTP 204), pokud je úspěšně aktualizována,
+    /// nebo <see cref="NotFoundResult"/>, pokud položka neexistuje.
+    /// </returns>
     [HttpPut("{toDoItemId:int}")]
     public IActionResult UpdateById(int toDoItemId, [FromBody] ToDoItemUpdateRequestDto request)
     {
@@ -79,31 +112,13 @@ public class ToDoItemsController : ControllerBase
         {
             var index = items.FindIndex(i => i.ToDoItemId == toDoItemId);
             if (index < 0)
-                return NotFound(); //404
+                return NotFound();
 
             var updatedItem = request.ToDomain();
             updatedItem.ToDoItemId = toDoItemId;
 
             items[index] = updatedItem;
 
-            return NoContent();//204
-        }
-        catch (Exception ex)
-        {
-            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError); // 500
-        }
-    }
-
-    [HttpDelete("{toDoItemId:int}")]
-    public IActionResult DeleteById(int toDoItemId)
-    {
-        try
-        {
-            var item = items.Find(i => i.ToDoItemId == toDoItemId); // najde položku podle ID list vrátí prvek/null
-            if (item is null)
-                return NotFound(); // 404
-
-            items.Remove(item); // smaže a vrátí 204
             return NoContent();
         }
         catch (Exception ex)
@@ -111,6 +126,35 @@ public class ToDoItemsController : ControllerBase
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
     }
+    /// <summary>
+    /// Odstraní ToDo položku podle ID.
+    /// </summary>
+    /// <param name="toDoItemId">ID položky, kterou chceme odstranit.</param>
+    /// <returns>
+    /// Vrací <see cref="NoContentResult"/> (HTTP 204), pokud je položka úspěšně smazána,
+    /// nebo <see cref="NotFoundResult"/>, 404 pokud neexistuje.
+    /// </returns>
+    [HttpDelete("{toDoItemId:int}")]
+    public IActionResult DeleteById(int toDoItemId)
+    {
+        try
+        {
+            var item = items.Find(i => i.ToDoItemId == toDoItemId);
+            if (item is null)
+                return NotFound();
+
+            items.Remove(item);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
+        }
+    }
+    /// <summary>
+    /// Pomocná metoda pro testy — přidá položku přímo do úložiště.
+    /// </summary>
+    /// <param name="item">Položka k přidání.</param>
     public void AddItemToStorage(ToDoItem item)
     {
         items.Add(item);

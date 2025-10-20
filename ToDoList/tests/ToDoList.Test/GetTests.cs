@@ -1,5 +1,7 @@
 namespace ToDoList.Test;
 
+using ToDoList.Domain.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.Models;
 using ToDoList.WebApi;
 
@@ -38,6 +40,33 @@ public class GetTests
         Assert.Equal(todoItem1.ToDoItemId, firstToDo.Id);
         Assert.Equal(todoItem1.Name, firstToDo.Name);
         Assert.Equal(todoItem1.Description, firstToDo.Description);
-        Assert.Equal(todoItem1.Description, firstToDo.Description);
+    }
+    [Fact]
+    public void Get_ById_ReturnsCorrectItem()
+    {
+        // Arrange
+        var todoItem = new ToDoItem
+        {
+            ToDoItemId = 1,
+            Name = "Jmeno1",
+            Description = "Popis1",
+            IsCompleted = false
+        };
+
+        var controller = new ToDoItemsController();
+        controller.AddItemToStorage(todoItem);
+
+        // Act
+        var result = controller.ReadById(1) as OkObjectResult;
+
+        // Assert
+        Assert.NotNull(result);
+        var value = result!.Value as ToDoItemGetResponseDto;
+        Assert.NotNull(value);
+
+        Assert.Equal(todoItem.ToDoItemId, value!.Id);
+        Assert.Equal(todoItem.Name, value.Name);
+        Assert.Equal(todoItem.Description, value.Description);
+        Assert.Equal(todoItem.IsCompleted, value.IsCompleted);
     }
 }
