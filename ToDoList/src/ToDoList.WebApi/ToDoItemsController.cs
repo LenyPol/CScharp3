@@ -27,23 +27,26 @@ public class ToDoItemsController : ControllerBase
     [HttpPost]
     public IActionResult Create([FromBody] ToDoItemCreateRequestDto request)
     {
-        var item = request.ToDomain();
-
         try
         {
+            if (string.IsNullOrWhiteSpace(request.Name))
+                throw new ArgumentException("Name cannot be null or empty.");
+
+            var item = request.ToDomain();
+
             item.ToDoItemId = items.Count == 0 ? 1 : items.Max(o => o.ToDoItemId) + 1;
             items.Add(item);
+
+            return CreatedAtAction(
+                nameof(ReadById),
+                new { toDoItemId = item.ToDoItemId },
+                ToDoItemGetResponseDto.FromDomain(item)
+            );
         }
         catch (Exception ex)
         {
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
-
-        return CreatedAtAction(
-            nameof(ReadById),
-            new { toDoItemId = item.ToDoItemId },
-            ToDoItemGetResponseDto.FromDomain(item)
-        );
     }
     /// <summary>
     /// Vrátí všechny uložené ToDo položky.
@@ -110,14 +113,13 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var index = items.FindIndex(i => i.ToDoItemId == toDoItemId);
-            if (index < 0)
+            var item = items.SingleOrDefault(i => i.ToDoItemId == toDoItemId);
+            if (item is null)
                 return NotFound();
 
-            var updatedItem = request.ToDomain();
-            updatedItem.ToDoItemId = toDoItemId;
-
-            items[index] = updatedItem;
+            item.Name = request.Name;
+            item.Description = request.Description;
+            item.IsCompleted = request.IsCompleted;
 
             return NoContent();
         }

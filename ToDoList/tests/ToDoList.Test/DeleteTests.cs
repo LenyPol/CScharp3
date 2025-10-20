@@ -1,11 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.Models;
 using ToDoList.WebApi;
+using System.Reflection;
 
 namespace ToDoList.Test;
 
 public class DeleteTests
 {
+    public DeleteTests()
+    {
+        var field = typeof(ToDoItemsController)
+            .GetField("items", BindingFlags.NonPublic | BindingFlags.Static);
+        (field?.GetValue(null) as IList<ToDoItem>)?.Clear();
+    }
+
     [Fact]
     public void Delete_ExistingItem_ReturnsNoContent()
     {

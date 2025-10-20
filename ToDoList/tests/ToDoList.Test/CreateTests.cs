@@ -2,11 +2,19 @@ using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 using ToDoList.WebApi;
+using System.Reflection;
 
 namespace ToDoList.Test;
 
 public class CreateTests
 {
+    public CreateTests()
+    {
+        var field = typeof(ToDoItemsController)
+            .GetField("items", BindingFlags.NonPublic | BindingFlags.Static);
+        (field?.GetValue(null) as IList<ToDoItem>)?.Clear();
+    }
+
     [Fact]
     public void Create_ValidItem_ReturnCreatedItem()
     {

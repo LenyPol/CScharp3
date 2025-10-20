@@ -4,9 +4,17 @@ using ToDoList.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.Models;
 using ToDoList.WebApi;
+using System.Reflection;
 
 public class GetTests
 {
+    public GetTests()
+    {
+        var field = typeof(ToDoItemsController)
+            .GetField("items", BindingFlags.NonPublic | BindingFlags.Static);
+        (field?.GetValue(null) as IList<ToDoItem>)?.Clear();
+    }
+
     [Fact]
     public void Get_AllItems_ReturnsAllItems()
     {
