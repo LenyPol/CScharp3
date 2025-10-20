@@ -6,14 +6,8 @@ using System.Reflection;
 
 namespace ToDoList.Test;
 
-public class UpdateTests
+public class UpdateTests : ToDoListControllerTestBase
 {
-    public UpdateTests()
-    {
-        var field = typeof(ToDoItemsController)
-            .GetField("items", BindingFlags.NonPublic | BindingFlags.Static);
-        (field?.GetValue(null) as IList<ToDoItem>)?.Clear();
-    }
 
     [Fact]
     public void Update_ExistingItem_ReturnsNoContent_UpdateItem()
@@ -27,17 +21,16 @@ public class UpdateTests
             IsCompleted = false
         };
 
-        var controller = new ToDoItemsController();
-        controller.AddItemToStorage(todoItem);
+        TestItems.Add(todoItem);
 
         var updateRequest = new ToDoItemUpdateRequestDto("Jmeno2", "Popis2", true);
         // Act
-        var result = controller.UpdateById(1, updateRequest);
+        var result = Controller.UpdateById(1, updateRequest);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
 
-        var readResult = controller.ReadById(1) as OkObjectResult;
+        var readResult = Controller.ReadById(1) as OkObjectResult;
         Assert.NotNull(readResult);
 
         var value = readResult!.Value as ToDoItemGetResponseDto;
@@ -52,7 +45,6 @@ public class UpdateTests
     {
         // Arrange
         var controller = new ToDoItemsController();
-
         var updateRequest = new ToDoItemUpdateRequestDto("NonExisting", "Attempt to update", false);
 
         // Act

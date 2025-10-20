@@ -14,7 +14,15 @@ using System.Linq;
 
 public class ToDoItemsController : ControllerBase
 {
-    private static readonly List<ToDoItem> items = [];
+    private static List<ToDoItem> items = [];
+    private readonly List<ToDoItem> _items;
+
+    public ToDoItemsController(List<ToDoItem>? testItems = null)
+    {
+        _items = testItems ?? items;
+        if (testItems != null)
+            items = _items;
+    }
 
     /// <summary>
     /// Vytvoří nový ToDoItem na základě dat z požadavku.
@@ -34,8 +42,8 @@ public class ToDoItemsController : ControllerBase
 
             var item = request.ToDomain();
 
-            item.ToDoItemId = items.Count == 0 ? 1 : items.Max(o => o.ToDoItemId) + 1;
-            items.Add(item);
+            item.ToDoItemId = _items.Count == 0 ? 1 : items.Max(o => o.ToDoItemId) + 1;
+            _items.Add(item);
 
             return CreatedAtAction(
                 nameof(ReadById),
@@ -63,7 +71,7 @@ public class ToDoItemsController : ControllerBase
             if (items == null)
                 return NotFound();
 
-            var response = items
+            var response = _items
                 .Select(ToDoItemGetResponseDto.FromDomain)
                 .ToList();
 
@@ -87,7 +95,7 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = items.Find(i => i.ToDoItemId == toDoItemId);
+            var item = _items.Find(i => i.ToDoItemId == toDoItemId);
 
             if (item is null)
                 return NotFound();
@@ -113,7 +121,7 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = items.SingleOrDefault(i => i.ToDoItemId == toDoItemId);
+            var item = _items.SingleOrDefault(i => i.ToDoItemId == toDoItemId);
             if (item is null)
                 return NotFound();
 
@@ -141,11 +149,11 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = items.Find(i => i.ToDoItemId == toDoItemId);
+            var item = _items.Find(i => i.ToDoItemId == toDoItemId);
             if (item is null)
                 return NotFound();
 
-            items.Remove(item);
+            _items.Remove(item);
             return NoContent();
         }
         catch (Exception ex)
@@ -159,7 +167,7 @@ public class ToDoItemsController : ControllerBase
     /// <param name="item">Položka k přidání.</param>
     public void AddItemToStorage(ToDoItem item)
     {
-        items.Add(item);
+        _items.Add(item);
     }
 }
 

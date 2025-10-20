@@ -6,14 +6,8 @@ using System.Reflection;
 
 namespace ToDoList.Test;
 
-public class CreateTests
+public class CreateTests : ToDoListControllerTestBase
 {
-    public CreateTests()
-    {
-        var field = typeof(ToDoItemsController)
-            .GetField("items", BindingFlags.NonPublic | BindingFlags.Static);
-        (field?.GetValue(null) as IList<ToDoItem>)?.Clear();
-    }
 
     [Fact]
     public void Create_ValidItem_ReturnCreatedItem()
