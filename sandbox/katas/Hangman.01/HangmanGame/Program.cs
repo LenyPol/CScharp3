@@ -26,7 +26,7 @@ public class Program
                 Console.WriteLine(game.GetHangmanAscii());
                 Console.WriteLine($"\nWord   : {game.MaskedWord}");
                 Console.WriteLine($"Right  : {string.Join(", ", game.CorrectGuesses)}");
-                Console.WriteLine($"Wrong  : {string.Join(", ", game.IncorrectGuesses.Where(char.IsLetter))}");
+                Console.WriteLine($"Wrong  : {max - game.RemainingGuesses}  |  Used letters: {string.Join(", ", game.UsedLetters)}");
                 Console.WriteLine($"Left   : {game.RemainingGuesses}");
 
                 Console.Write("\nGuess a letter (A-Z) or type the whole word: "); //vstup od hráče  a vyhodnocení

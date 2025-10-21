@@ -21,7 +21,8 @@ public class Hangman
     private readonly string _secret; //ALLCAPS, jen A–Z
     private readonly int _maxIncorrect; // limit chyb pro hru
     private readonly HashSet<char> _correct = new();
-    private readonly HashSet<char> _incorrect = new();
+    private readonly HashSet<char> _usedLetters = new();
+    private int _wrongGuesses = 0;
 
     public Hangman(string secretWord, int maxIncorrectGuesses) // Zajišťuje “EN-only” a vše převádí na velká písmena
     {
@@ -61,13 +62,12 @@ public class Hangman
     }
 
     //vytvoření nového listu při každém čtení
-    public IReadOnlyCollection<char> IncorrectGuesses =>
-        _incorrect.OrderBy(c => c).ToList().AsReadOnly();
-
     public IReadOnlyCollection<char> CorrectGuesses =>
         _correct.OrderBy(c => c).ToList().AsReadOnly();
+    public IReadOnlyCollection<char> UsedLetters =>
+    _usedLetters.OrderBy(c => c).ToList().AsReadOnly();
 
-    public int RemainingGuesses => Math.Max(0, _maxIncorrect - _incorrect.Count); //kolik chybných pokusů ještě zbývá.
+    public int RemainingGuesses => Math.Max(0, _maxIncorrect - _wrongGuesses);
     public string SecretWord => _secret;
 
     //Zpracuje pokus o hádání jednoho písmene
@@ -79,7 +79,8 @@ public class Hangman
         char normalized = char.ToUpperInvariant(letter);
         if (!IsLetter(normalized))
             return GuessResult.Invalid;
-        if (_correct.Contains(normalized) || _incorrect.Contains(normalized))
+
+        if (_correct.Contains(normalized) || _usedLetters.Contains(normalized))
             return GuessResult.Duplicate;
 
         if (_secret.Contains(normalized))
@@ -89,7 +90,7 @@ public class Hangman
             return GuessResult.Correct;
         }
 
-        _incorrect.Add(normalized);
+        _wrongGuesses++; // zvýšení počtu chybných pokusů
         RecalculateState();
         return GuessResult.Incorrect;
     }
@@ -115,7 +116,7 @@ public class Hangman
             return GuessResult.Correct;
         }
 
-        _incorrect.Add('*');
+        _wrongGuesses++;
         RecalculateState();
         return GuessResult.Incorrect;
     }
@@ -123,7 +124,7 @@ public class Hangman
     //určí Won/Lost/InProgress podle správných/špatných pokusů.
     private void RecalculateState()
     {
-        if (_incorrect.Count >= _maxIncorrect)
+        if (_wrongGuesses >= _maxIncorrect)
         {
             State = GameState.Lost;
             return;
@@ -143,7 +144,7 @@ public class Hangman
     //ASCII “šibenice” podle počtu chyb.
     public string GetHangmanAscii()
     {
-        int wrong = _incorrect.Count;
+        int wrong = _wrongGuesses;
         return wrong switch
         {
             0 => @"
