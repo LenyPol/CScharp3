@@ -6,15 +6,24 @@ namespace ToDoList.Test;
 
 public abstract class ToDoListControllerTestBase
 {
-    protected readonly ToDoItemsController Controller;
-    protected readonly List<ToDoItem> TestItems;
+    protected ToDoItemsController Controller { get; }
 
     protected ToDoListControllerTestBase()
     {
-        // Vždy nový prázdný seznam pro každý test
-        TestItems = new List<ToDoItem>();
+        Controller = new ToDoItemsController();
+    }
 
-        // Vytvoří kontroler s tímto testovacím seznamem
-        Controller = new ToDoItemsController(TestItems);
+    protected void AddItemToStorage(ToDoItem item)
+    {
+        var field = typeof(ToDoItemsController)
+            .GetField("items", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        var items = (List<ToDoItem>)field.GetValue(Controller)!;
+
+        item.ToDoItemId = item.ToDoItemId == 0
+            ? (items.Count == 0 ? 1 : items.Max(o => o.ToDoItemId) + 1)
+            : item.ToDoItemId;
+
+        items.Add(item);
     }
 }
+

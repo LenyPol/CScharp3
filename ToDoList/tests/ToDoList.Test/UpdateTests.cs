@@ -21,7 +21,7 @@ public class UpdateTests : ToDoListControllerTestBase
             IsCompleted = false
         };
 
-        TestItems.Add(todoItem);
+        AddItemToStorage(todoItem);
 
         var updateRequest = new ToDoItemUpdateRequestDto("Jmeno2", "Popis2", true);
         // Act

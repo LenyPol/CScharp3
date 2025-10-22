@@ -26,12 +26,12 @@ public class GetTests : ToDoListControllerTestBase
             Description = "Popis2",
             IsCompleted = true
         };
-        var controller = new ToDoItemsController();
-        controller.AddItemToStorage(todoItem1);
-        controller.AddItemToStorage(todoItem2);
+
+        AddItemToStorage(todoItem1);
+        AddItemToStorage(todoItem2);
 
         // Act
-        var result = controller.Read();
+        var result = Controller.Read();
         var value = result.GetValue();
 
         // Assert
@@ -54,11 +54,10 @@ public class GetTests : ToDoListControllerTestBase
             IsCompleted = false
         };
 
-        var controller = new ToDoItemsController();
-        controller.AddItemToStorage(todoItem);
+        AddItemToStorage(todoItem);
 
         // Act
-        var result = controller.ReadById(1) as OkObjectResult;
+        var result = Controller.ReadById(1) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);

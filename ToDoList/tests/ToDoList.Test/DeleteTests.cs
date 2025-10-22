@@ -19,11 +19,11 @@ public class DeleteTests : ToDoListControllerTestBase
             Description = "Popis1",
             IsCompleted = false
         };
-        var controller = new ToDoItemsController();
-        controller.AddItemToStorage(todoItem);
+
+        AddItemToStorage(todoItem);
 
         // Act
-        var result = controller.DeleteById(1);
+        var result = Controller.DeleteById(1);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
@@ -54,13 +54,12 @@ public class DeleteTests : ToDoListControllerTestBase
             IsCompleted = false
         };
 
-        var controller = new ToDoItemsController();
-        controller.AddItemToStorage(todoItem);
+        AddItemToStorage(todoItem);
 
         // Act
-        controller.DeleteById(10);
+        Controller.DeleteById(10);
 
-        var result = controller.Read();
+        var result = Controller.Read();
         var value = result.GetValue();
 
         // Assert
