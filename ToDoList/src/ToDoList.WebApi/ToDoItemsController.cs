@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 using System.Linq;
+using ToDoList.Persistence;
 
 /// <summary>
 /// Controller pro správu ToDo položek.
@@ -14,9 +15,24 @@ using System.Linq;
 
 public class ToDoItemsController : ControllerBase
 {
-    private readonly List<ToDoItem> items = [];
+    private readonly List<ToDoItem> items = []; // po dopsání úkolu již není potřeba a můžeme smazat
 
+    private readonly ToDoItemsContext context;
 
+    public ToDoItemsController(ToDoItemsContext context)
+    {
+        this.context = context;
+
+        //ToDoItem item = new ToDoItem
+        // {
+        //     Name = "Prvni ukol",
+        //     Description = "Prvni popisek",
+        //     IsCompleted = false
+        // };
+
+        //context.ToDoItems.Add(item);
+        //context.SaveChanges();
+    }
     /// <summary>
     /// Vytvoří nový ToDoItem na základě dat z požadavku.
     /// </summary>
