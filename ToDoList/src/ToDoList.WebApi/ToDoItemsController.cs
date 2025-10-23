@@ -17,11 +17,11 @@ public class ToDoItemsController : ControllerBase
 {
     private readonly List<ToDoItem> items = []; // po dopsání úkolu již není potřeba a můžeme smazat
 
-    private readonly ToDoItemsContext context;
+    //private readonly ToDoItemsContext context;
 
-    public ToDoItemsController(ToDoItemsContext context)
-    {
-        this.context = context;
+    //public ToDoItemsController(ToDoItemsContext context)
+    //{
+        //this.context = context;
 
         //ToDoItem item = new ToDoItem
         // {
@@ -32,7 +32,7 @@ public class ToDoItemsController : ControllerBase
 
         //context.ToDoItems.Add(item);
         //context.SaveChanges();
-    }
+    //}
     /// <summary>
     /// Vytvoří nový ToDoItem na základě dat z požadavku.
     /// </summary>
