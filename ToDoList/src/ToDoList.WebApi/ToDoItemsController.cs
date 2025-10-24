@@ -5,6 +5,7 @@ using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 using System.Linq;
 using ToDoList.Persistence;
+using Microsoft.AspNetCore.Http.Features;
 
 /// <summary>
 /// Controller pro správu ToDo položek.
@@ -13,26 +14,9 @@ using ToDoList.Persistence;
 [Route("api/[controller]")]
 [ApiController]
 
-public class ToDoItemsController : ControllerBase
+public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
 {
-    private readonly List<ToDoItem> items = []; // po dopsání úkolu již není potřeba a můžeme smazat
-
-    //private readonly ToDoItemsContext context;
-
-    //public ToDoItemsController(ToDoItemsContext context)
-    //{
-        //this.context = context;
-
-        //ToDoItem item = new ToDoItem
-        // {
-        //     Name = "Prvni ukol",
-        //     Description = "Prvni popisek",
-        //     IsCompleted = false
-        // };
-
-        //context.ToDoItems.Add(item);
-        //context.SaveChanges();
-    //}
+    private readonly ToDoItemsContext dbContext = dbContext;
     /// <summary>
     /// Vytvoří nový ToDoItem na základě dat z požadavku.
     /// </summary>
@@ -51,8 +35,8 @@ public class ToDoItemsController : ControllerBase
 
             var item = request.ToDomain();
 
-            item.ToDoItemId = items.Count == 0 ? 1 : items.Max(o => o.ToDoItemId) + 1;
-            items.Add(item);
+            dbContext.ToDoItems.Add(item);
+            dbContext.SaveChanges();
 
             return CreatedAtAction(
                 nameof(ReadById),
@@ -77,7 +61,9 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            if (items == null)
+            var items = dbContext.ToDoItems.ToList();
+
+            if (items.Count == 0)
                 return NotFound();
 
             var response = items
@@ -104,7 +90,8 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = items.Find(i => i.ToDoItemId == toDoItemId);
+            var item = dbContext.ToDoItems
+                .SingleOrDefault(i => i.ToDoItemId == toDoItemId);
 
             if (item is null)
                 return NotFound();
@@ -130,13 +117,15 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = items.SingleOrDefault(i => i.ToDoItemId == toDoItemId);
+            var item = dbContext.ToDoItems.SingleOrDefault(i => i.ToDoItemId == toDoItemId);
             if (item is null)
                 return NotFound();
 
             item.Name = request.Name;
             item.Description = request.Description;
             item.IsCompleted = request.IsCompleted;
+
+            dbContext.SaveChanges();
 
             return NoContent();
         }
@@ -156,19 +145,14 @@ public class ToDoItemsController : ControllerBase
     [HttpDelete("{toDoItemId:int}")]
     public IActionResult DeleteById(int toDoItemId)
     {
-        try
-        {
-            var item = items.Find(i => i.ToDoItemId == toDoItemId);
-            if (item is null)
-                return NotFound();
+        var item = dbContext.ToDoItems.SingleOrDefault(i => i.ToDoItemId == toDoItemId);
+        if (item is null)
+            return NotFound();
 
-            items.Remove(item);
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
-        }
+        dbContext.ToDoItems.Remove(item);
+        dbContext.SaveChanges();
+
+        return NoContent();
     }
 }
 
