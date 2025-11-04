@@ -3,7 +3,7 @@ using ToDoList.Domain.Models;
 using ToDoList.WebApi;
 using System.Reflection;
 
-namespace ToDoList.Test;
+namespace ToDoList.Test.IntegrationTests;
 
 public class DeleteTests : ToDoListControllerTestBase
 {
@@ -20,23 +20,24 @@ public class DeleteTests : ToDoListControllerTestBase
             IsCompleted = false
         };
 
-        AddItemToStorage(todoItem);
+        DbContext.ToDoItems.Add(todoItem);
+        DbContext.SaveChanges();
 
         // Act
-        var result = Controller.DeleteById(1);
+        var result = Controller.DeleteById(todoItem.ToDoItemId);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
+
+        var deleted = DbContext.ToDoItems.SingleOrDefault(i => i.ToDoItemId == todoItem.ToDoItemId);
+        Assert.Null(deleted);
     }
 
     [Fact]
     public void Delete_NonExistingItem_ReturnsNotFound()
     {
-        // Arrange
-        var controller = new ToDoItemsController();
-
         // Act
-        var result = controller.DeleteById(999);
+        var result = Controller.DeleteById(999);
 
         // Assert
         Assert.IsType<NotFoundResult>(result);
@@ -54,16 +55,14 @@ public class DeleteTests : ToDoListControllerTestBase
             IsCompleted = false
         };
 
-        AddItemToStorage(todoItem);
+        DbContext.ToDoItems.Add(todoItem);
+        DbContext.SaveChanges();
 
         // Act
-        Controller.DeleteById(10);
-
-        var result = Controller.Read();
-        var value = result.GetValue();
+        Controller.DeleteById(todoItem.ToDoItemId);
 
         // Assert
-        Assert.NotNull(value);
-        Assert.DoesNotContain(value, i => i.Id == 10);
+        var items = DbContext.ToDoItems.ToList();
+        Assert.DoesNotContain(items, i => i.ToDoItemId == todoItem.ToDoItemId);
     }
 }

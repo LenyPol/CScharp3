@@ -1,4 +1,4 @@
-namespace ToDoList.Test;
+namespace ToDoList.Test.IntegrationTests;
 
 using ToDoList.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -27,20 +27,23 @@ public class GetTests : ToDoListControllerTestBase
             IsCompleted = true
         };
 
-        AddItemToStorage(todoItem1);
-        AddItemToStorage(todoItem2);
+        DbContext.ToDoItems.AddRange(todoItem1, todoItem2);
+        DbContext.SaveChanges();
 
         // Act
-        var result = Controller.Read();
-        var value = result.GetValue();
+        var actionResult = Controller.Read();
+        var result = actionResult.Result as OkObjectResult;
 
         // Assert
+        Assert.NotNull(result);
+        var value = result.Value as List<ToDoItemGetResponseDto>;
         Assert.NotNull(value);
+        Assert.Equal(2, value.Count);
 
         var firstToDo = value.First();
-        Assert.Equal(todoItem1.ToDoItemId, firstToDo.Id);
-        Assert.Equal(todoItem1.Name, firstToDo.Name);
-        Assert.Equal(todoItem1.Description, firstToDo.Description);
+        Assert.Equal("Jmeno1", firstToDo.Name);
+        Assert.Equal("Popis1", firstToDo.Description);
+        Assert.False(firstToDo.IsCompleted);
     }
     [Fact]
     public void Get_ById_ReturnsCorrectItem()
@@ -48,16 +51,17 @@ public class GetTests : ToDoListControllerTestBase
         // Arrange
         var todoItem = new ToDoItem
         {
-            ToDoItemId = 1,
             Name = "Jmeno1",
             Description = "Popis1",
             IsCompleted = false
         };
 
-        AddItemToStorage(todoItem);
+        DbContext.ToDoItems.Add(todoItem);
+        DbContext.SaveChanges();
 
+        var id = todoItem.ToDoItemId;
         // Act
-        var result = Controller.ReadById(1) as OkObjectResult;
+        var result = Controller.ReadById(todoItem.ToDoItemId) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -68,5 +72,14 @@ public class GetTests : ToDoListControllerTestBase
         Assert.Equal(todoItem.Name, value.Name);
         Assert.Equal(todoItem.Description, value.Description);
         Assert.Equal(todoItem.IsCompleted, value.IsCompleted);
+    }
+    [Fact]
+    public void Get_ById_NonExisting_ReturnsNotFound()
+    {
+        // Act
+        var result = Controller.ReadById(9999);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
     }
 }
