@@ -60,7 +60,7 @@ public class CreateTests : ToDoListControllerTestBase
         var result = Controller.Create(createRequest);
 
         // Assert
-        var problemResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, problemResult.StatusCode);
+        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+        Assert.Equal(400, badRequestResult.StatusCode);
     }
 }
