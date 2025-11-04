@@ -5,7 +5,7 @@ using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 using System.Linq;
 using ToDoList.Persistence;
-using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 
 /// <summary>
 /// Controller pro správu ToDo položek.
@@ -31,7 +31,7 @@ public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
         try
         {
             if (string.IsNullOrWhiteSpace(request.Name))
-                throw new ArgumentException("Name cannot be null or empty.");
+               return BadRequest("Name cannot be null or empty.");
 
             var item = request.ToDomain();
 
@@ -61,10 +61,7 @@ public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
     {
         try
         {
-            var items = dbContext.ToDoItems.ToList();
-
-            if (items.Count == 0)
-                return NotFound();
+            var items = dbContext.ToDoItems.AsNoTracking().ToList();
 
             var response = items
                 .Select(ToDoItemGetResponseDto.FromDomain)
@@ -91,6 +88,7 @@ public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
         try
         {
             var item = dbContext.ToDoItems
+                .AsNoTracking()
                 .SingleOrDefault(i => i.ToDoItemId == toDoItemId);
 
             if (item is null)
