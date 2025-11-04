@@ -4,7 +4,7 @@ using ToDoList.Domain.Models;
 using ToDoList.WebApi;
 using System.Reflection;
 
-namespace ToDoList.Test;
+namespace ToDoList.Test.IntegrationTests;
 
 public class UpdateTests : ToDoListControllerTestBase
 {
@@ -15,40 +15,37 @@ public class UpdateTests : ToDoListControllerTestBase
         //Arrange
         var todoItem = new ToDoItem
         {
-            ToDoItemId = 1,
             Name = "Jmeno1",
             Description = "Popis1",
             IsCompleted = false
         };
 
-        AddItemToStorage(todoItem);
+        DbContext.ToDoItems.Add(todoItem);
+        DbContext.SaveChanges();
+        var id = todoItem.ToDoItemId;
 
         var updateRequest = new ToDoItemUpdateRequestDto("Jmeno2", "Popis2", true);
+
         // Act
-        var result = Controller.UpdateById(1, updateRequest);
+        var result = Controller.UpdateById(id, updateRequest);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
 
-        var readResult = Controller.ReadById(1) as OkObjectResult;
-        Assert.NotNull(readResult);
-
-        var value = readResult!.Value as ToDoItemGetResponseDto;
-        Assert.NotNull(value);
-
-        Assert.Equal("Jmeno2", value!.Name);
-        Assert.Equal("Popis2", value.Description);
-        Assert.True(value.IsCompleted);
+        var updateItem = DbContext.ToDoItems.Find(todoItem.ToDoItemId);
+        Assert.NotNull(updateItem);
+        Assert.Equal("Jmeno2", updateItem!.Name);
+        Assert.Equal("Popis2", updateItem.Description);
+        Assert.True(updateItem.IsCompleted);
     }
     [Fact]
     public void Update_NonExistingItem_ReturnsNotFound()
     {
         // Arrange
-        var controller = new ToDoItemsController();
         var updateRequest = new ToDoItemUpdateRequestDto("NonExisting", "Attempt to update", false);
 
         // Act
-        var result = controller.UpdateById(999, updateRequest);
+        var result = Controller.UpdateById(999, updateRequest);
 
         // Assert
         Assert.IsType<NotFoundResult>(result);
