@@ -5,7 +5,6 @@ using ToDoList.Domain.Models;
 
 public class ToDoItemsRepository(ToDoItemsContext dbContext) : IRepository<ToDoItem>
 {
-    private readonly ToDoItemsContext dbContext = dbContext;
     public void Create(ToDoItem item)
     {
         dbContext.ToDoItems.Add(item);
@@ -20,7 +19,6 @@ public class ToDoItemsRepository(ToDoItemsContext dbContext) : IRepository<ToDoI
     public ToDoItem? ReadById(int id)
     {
         return dbContext.ToDoItems
-            .AsNoTracking()
             .SingleOrDefault(i => i.ToDoItemId == id);
     }
     public void Update(ToDoItem item)
@@ -40,6 +38,7 @@ public class ToDoItemsRepository(ToDoItemsContext dbContext) : IRepository<ToDoI
         {
             dbContext.ToDoItems.Remove(existing);
             dbContext.SaveChanges();
+            dbContext.ChangeTracker.Clear();
         }
     }
 }
