@@ -49,6 +49,8 @@ public class CreateTests : ToDoListControllerTestBase
         var result2 = Controller.Create(item2) as CreatedAtActionResult;
 
         // Assert
+        Assert.NotNull(result1);
+        Assert.NotNull(result2);
         var value1 = result1!.Value as ToDoItemGetResponseDto;
         var value2 = result2!.Value as ToDoItemGetResponseDto;
 
