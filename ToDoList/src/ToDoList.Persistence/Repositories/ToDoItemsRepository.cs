@@ -19,7 +19,6 @@ public class ToDoItemsRepository(ToDoItemsContext dbContext) : IRepository<ToDoI
     public ToDoItem? ReadById(int id)
     {
         return dbContext.ToDoItems
-            .AsNoTracking()
             .SingleOrDefault(i => i.ToDoItemId == id);
     }
     public void Update(ToDoItem item)
@@ -30,6 +29,7 @@ public class ToDoItemsRepository(ToDoItemsContext dbContext) : IRepository<ToDoI
 
         dbContext.Entry(existing).CurrentValues.SetValues(item);
         dbContext.SaveChanges();
+        dbContext.ChangeTracker.Clear();
     }
     public void Delete(ToDoItem item)
     {
