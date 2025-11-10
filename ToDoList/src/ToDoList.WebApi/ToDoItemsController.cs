@@ -6,6 +6,7 @@ using ToDoList.Domain.Models;
 using System.Linq;
 using ToDoList.Persistence;
 using Microsoft.EntityFrameworkCore;
+using ToDoList.Persistence.Repositories;
 
 /// <summary>
 /// Controller pro správu ToDo položek.
@@ -14,9 +15,14 @@ using Microsoft.EntityFrameworkCore;
 [Route("api/[controller]")]
 [ApiController]
 
-public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
+public class ToDoItemsController : ControllerBase
 {
-    private readonly ToDoItemsContext dbContext = dbContext;
+    private readonly IRepository<ToDoItem> repository;
+
+    public ToDoItemsController(IRepository<ToDoItem> repository)
+    {
+        this.repository = repository;
+    }
     /// <summary>
     /// Vytvoří nový ToDoItem na základě dat z požadavku.
     /// </summary>
@@ -31,12 +37,11 @@ public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
         try
         {
             if (string.IsNullOrWhiteSpace(request.Name))
-               return BadRequest("Name cannot be null or empty.");
+                return BadRequest("Name cannot be null or empty.");
 
             var item = request.ToDomain();
 
-            dbContext.ToDoItems.Add(item);
-            dbContext.SaveChanges();
+            repository.Create(item);
 
             return CreatedAtAction(
                 nameof(ReadById),
@@ -61,7 +66,7 @@ public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
     {
         try
         {
-            var items = dbContext.ToDoItems.AsNoTracking().ToList();
+            var items = repository.ReadAll();
 
             var response = items
                 .Select(ToDoItemGetResponseDto.FromDomain)
@@ -87,9 +92,7 @@ public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
     {
         try
         {
-            var item = dbContext.ToDoItems
-                .AsNoTracking()
-                .SingleOrDefault(i => i.ToDoItemId == toDoItemId);
+            var item = repository.ReadById(toDoItemId);
 
             if (item is null)
                 return NotFound();
@@ -115,7 +118,7 @@ public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
     {
         try
         {
-            var item = dbContext.ToDoItems.SingleOrDefault(i => i.ToDoItemId == toDoItemId);
+            var item = repository.ReadById(toDoItemId);
             if (item is null)
                 return NotFound();
 
@@ -123,7 +126,7 @@ public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
             item.Description = request.Description;
             item.IsCompleted = request.IsCompleted;
 
-            dbContext.SaveChanges();
+            repository.Update(item);
 
             return NoContent();
         }
@@ -143,14 +146,19 @@ public class ToDoItemsController(ToDoItemsContext dbContext) : ControllerBase
     [HttpDelete("{toDoItemId:int}")]
     public IActionResult DeleteById(int toDoItemId)
     {
-        var item = dbContext.ToDoItems.SingleOrDefault(i => i.ToDoItemId == toDoItemId);
-        if (item is null)
-            return NotFound();
+        try
+        {
+            var item = repository.ReadById(toDoItemId);
+            if (item is null)
+                return NotFound();
 
-        dbContext.ToDoItems.Remove(item);
-        dbContext.SaveChanges();
-
-        return NoContent();
+            repository.Delete(item);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
+        }
     }
 }
 

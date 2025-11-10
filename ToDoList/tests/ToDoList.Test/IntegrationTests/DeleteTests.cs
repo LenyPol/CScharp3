@@ -14,7 +14,6 @@ public class DeleteTests : ToDoListControllerTestBase
         //Arrange
         var todoItem = new ToDoItem
         {
-            ToDoItemId = 1,
             Name = "Jmeno1",
             Description = "Popis1",
             IsCompleted = false
@@ -49,7 +48,6 @@ public class DeleteTests : ToDoListControllerTestBase
         // Arrange
         var todoItem = new ToDoItem
         {
-            ToDoItemId = 10,
             Name = "Jmeno10",
             Description = "Popis10",
             IsCompleted = false
