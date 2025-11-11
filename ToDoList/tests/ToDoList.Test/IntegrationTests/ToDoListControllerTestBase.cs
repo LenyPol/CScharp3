@@ -2,14 +2,18 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using ToDoList.Domain.Models;
 using ToDoList.Persistence;
+using ToDoList.Persistence.Repositories;
 using ToDoList.WebApi;
 
 namespace ToDoList.Test.IntegrationTests;
-
+/// <summary>
+/// Základní třída pro integrační testy – nastavuje izolovanou SQLite in-memory databázi.
+/// </summary>
 public abstract class ToDoListControllerTestBase : IDisposable
 {
     protected readonly ToDoItemsContext DbContext;
     protected readonly ToDoItemsController Controller;
+    protected readonly IRepository<ToDoItem> Repository;
 
 
     protected ToDoListControllerTestBase()
@@ -18,11 +22,15 @@ public abstract class ToDoListControllerTestBase : IDisposable
             .UseSqlite("Data Source=../../../IntegrationTests/data/localdb_test.db")
             .Options;
 
-        DbContext = new TestToDoItemsContext(options);
-
+        DbContext = new ToDoItemsContext(options);
         DbContext.Database.EnsureCreated();
 
-        Controller = new ToDoItemsController(DbContext);
+        DbContext.ToDoItems.RemoveRange(DbContext.ToDoItems);
+        DbContext.SaveChanges();
+        DbContext.Database.ExecuteSqlRaw("DELETE FROM sqlite_sequence WHERE name='ToDoItems';");
+
+        Repository = new ToDoItemsRepository(DbContext);
+        Controller = new ToDoItemsController(Repository);
     }
 
     public void Dispose()
@@ -31,6 +39,7 @@ public abstract class ToDoListControllerTestBase : IDisposable
         {
             DbContext.ToDoItems.RemoveRange(DbContext.ToDoItems);
             DbContext.SaveChanges();
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM sqlite_sequence WHERE name='ToDoItems';");
         }
         catch
         {

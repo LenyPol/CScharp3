@@ -402,6 +402,5 @@ FodyWeavers.xsd
 *.db-wal
 *.db-shm
 
-# Local database
-*.db
+
 

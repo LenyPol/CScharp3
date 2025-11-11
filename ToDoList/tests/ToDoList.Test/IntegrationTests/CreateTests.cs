@@ -6,6 +6,7 @@ using System.Reflection;
 
 namespace ToDoList.Test.IntegrationTests;
 
+[Collection("Sequential")]
 public class CreateTests : ToDoListControllerTestBase
 {
 
@@ -17,17 +18,23 @@ public class CreateTests : ToDoListControllerTestBase
 
         // Act
         var result = Controller.Create(createRequest) as CreatedAtActionResult;
+
         // Assert
         Assert.NotNull(result);
         Assert.Equal(nameof(ToDoItemsController.ReadById), result!.ActionName);
 
-        var value = result.Value as ToDoItemGetResponseDto;
-        Assert.NotNull(value);
+        var value = Assert.IsType<ToDoItemGetResponseDto>(result.Value);
 
         Assert.Equal("Jmeno1", value!.Name);
         Assert.Equal("Popis1", value.Description);
         Assert.False(value.IsCompleted);
         Assert.True(value.Id > 0);
+
+        var entity = DbContext.ToDoItems.SingleOrDefault(i => i.ToDoItemId == value.Id);
+        Assert.NotNull(entity);
+        Assert.Equal(value.Name, entity!.Name);
+        Assert.Equal(value.Description, entity.Description);
+        Assert.False(entity.IsCompleted);
 
     }
     [Fact]
@@ -42,12 +49,18 @@ public class CreateTests : ToDoListControllerTestBase
         var result2 = Controller.Create(item2) as CreatedAtActionResult;
 
         // Assert
+        Assert.NotNull(result1);
+        Assert.NotNull(result2);
         var value1 = result1!.Value as ToDoItemGetResponseDto;
         var value2 = result2!.Value as ToDoItemGetResponseDto;
 
         Assert.NotNull(value1);
         Assert.NotNull(value2);
         Assert.True(value2!.Id > value1!.Id);
+
+        var allItems = DbContext.ToDoItems.OrderBy(i => i.ToDoItemId).ToList();
+        Assert.Equal(2, allItems.Count);
+        Assert.True(allItems[1].ToDoItemId > allItems[0].ToDoItemId);
     }
 
     [Fact]
@@ -62,5 +75,7 @@ public class CreateTests : ToDoListControllerTestBase
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
         Assert.Equal(400, badRequestResult.StatusCode);
+        Assert.Equal("Name cannot be null or empty.", badRequestResult.Value);
+        Assert.Empty(DbContext.ToDoItems);
     }
 }

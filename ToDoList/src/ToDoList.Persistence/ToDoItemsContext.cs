@@ -21,4 +21,8 @@ public class ToDoItemsContext : DbContext
             optionsBuilder.UseSqlite(connectionString);
         }
     }
+    public ToDoItemsContext(DbContextOptions<ToDoItemsContext> options)
+        : base(options)
+    {
+    }
 }
