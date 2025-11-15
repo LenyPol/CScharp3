@@ -19,10 +19,11 @@ public abstract class ToDoListControllerTestBase : IDisposable
     protected ToDoListControllerTestBase()
     {
         var options = new DbContextOptionsBuilder<ToDoItemsContext>()
-            .UseSqlite("Data Source=../../../IntegrationTests/data/localdb_test.db")
+            .UseSqlite("DataSource=:memory:")
             .Options;
 
         DbContext = new ToDoItemsContext(options);
+        DbContext.Database.OpenConnection();
         DbContext.Database.EnsureCreated();
 
         DbContext.ToDoItems.RemoveRange(DbContext.ToDoItems);

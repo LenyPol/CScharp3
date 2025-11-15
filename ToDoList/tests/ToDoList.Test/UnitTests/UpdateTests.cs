@@ -11,7 +11,7 @@ public class UpdateTests
 {
 
     [Fact]
-    public void Update_ExistingItem_ReturnsNoContent_UpdateItem()
+    public void Put_UpdateByIdWhenItemUpdated_ReturnsNoContent()
     {
         //Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
@@ -44,7 +44,7 @@ public class UpdateTests
     }
 
     [Fact]
-    public void Update_NonExistingItem_ReturnsNotFound()
+    public void Put_UpdateByIdWhenIdNotFound_ReturnsNotFound()
     {
         // Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();

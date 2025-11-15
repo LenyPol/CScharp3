@@ -30,7 +30,6 @@ public class ToDoItemsRepository(ToDoItemsContext dbContext) : IRepository<ToDoI
 
         dbContext.Entry(existing).CurrentValues.SetValues(item);
         dbContext.SaveChanges();
-        dbContext.ChangeTracker.Clear();
     }
     public void Delete(ToDoItem item)
     {
