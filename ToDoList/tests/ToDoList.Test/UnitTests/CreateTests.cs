@@ -11,7 +11,7 @@ public class CreateTests
 {
 
     [Fact]
-    public void Create_ValidItem_ReturnCreatedItem()
+    public void Post_CreateValidRequest_ReturnsCreatedAtAction()
     {
         //Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
@@ -20,15 +20,14 @@ public class CreateTests
 
         // Simulujeme chování EF – po zavolání Create se novému objektu přidělí ID 1
         repositoryMock
-            .When(r => r.Create(Arg.Any<ToDoItem>()))
-            .Do(callInfo =>
-            {
-                var item = callInfo.Arg<ToDoItem>();
-                item.ToDoItemId = 1;
-            });
+        .Create(Arg.Do<ToDoItem>(item =>
+        {
+            item.ToDoItemId = 1;   //  nastaví ID do objektu vytvořeného v kontroleru
+        }));
 
         // Act
         var result = controller.Create(createRequest) as CreatedAtActionResult;
+
         // Assert
         Assert.NotNull(result);
         Assert.Equal(nameof(ToDoItemsController.ReadById), result!.ActionName);
@@ -44,7 +43,7 @@ public class CreateTests
     }
 
     [Fact]
-    public void Create_WhenExceptionOccurs_ReturnsProblem()
+    public void Post_CreateInvalidRequest_ReturnsBadRequest()
     {
         // Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();

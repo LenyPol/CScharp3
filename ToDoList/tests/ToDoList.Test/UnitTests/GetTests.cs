@@ -11,7 +11,7 @@ public class GetTests
 {
 
     [Fact]
-    public void Get_AllItems_ReturnsAllItems()
+    public void Get_ReadWhenSomeItemAvailable_ReturnsOk()
     {
         // Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
@@ -47,9 +47,11 @@ public class GetTests
         Assert.Equal("Jmeno1", firstToDo.Name);
         Assert.Equal("Popis1", firstToDo.Description);
         Assert.False(firstToDo.IsCompleted);
+
+        repositoryMock.Received(1).ReadAll();
     }
     [Fact]
-    public void Get_ById_ReturnsCorrectItem()
+    public void Get_ReadByIdWhenSomeItemAvailable_ReturnsOk()
     {
         // Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
@@ -77,10 +79,12 @@ public class GetTests
         Assert.Equal("Jmeno1", value.Name);
         Assert.Equal("Popis1", value.Description);
         Assert.False(value.IsCompleted);
+
+        repositoryMock.Received(1).ReadById(1);
     }
 
     [Fact]
-    public void Get_ById_NonExisting_ReturnsNotFound()
+    public void Get_ReadByIdWhenItemIsNull_ReturnsNotFound()
     {
         // Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
@@ -93,5 +97,7 @@ public class GetTests
 
         // Assert
         Assert.IsType<NotFoundResult>(result);
+
+        repositoryMock.Received(1).ReadById(Arg.Any<int>());
     }
 }
