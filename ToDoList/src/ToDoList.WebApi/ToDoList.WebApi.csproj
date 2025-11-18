@@ -11,4 +11,8 @@
     <ProjectReference Include="..\ToDoList.Persistence\ToDoList.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.0" />
+  </ItemGroup>
+
 </Project>

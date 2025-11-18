@@ -10,7 +10,7 @@ public class DeleteTests
 {
 
     [Fact]
-    public void Delete_ExistingItem_ReturnsNoContent()
+    public void Delete_DeleteByIdValidItemId_ReturnsNoContent()
     {
         //Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
@@ -35,7 +35,7 @@ public class DeleteTests
     }
 
     [Fact]
-    public void Delete_NonExistingItem_ReturnsNotFound()
+    public void Delete_DeleteByIdInvalidItemId_ReturnsNotFound()
     {
         // Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
@@ -53,7 +53,7 @@ public class DeleteTests
     }
 
     [Fact]
-    public void Delete_WhenRepositoryThrowsException_ReturnsInternalServerError()
+    public void Delete_DeleteByIdUnhandledException_ReturnsInternalServerError()
     {
         // Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
@@ -77,5 +77,8 @@ public class DeleteTests
         // Assert
         var problemResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(500, problemResult.StatusCode);
+
+        repositoryMock.Received(1).ReadById(10);
+        repositoryMock.Received(1).Delete(todoItem);
     }
 }
