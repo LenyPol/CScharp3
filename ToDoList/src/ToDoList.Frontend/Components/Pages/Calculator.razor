@@ -1,0 +1,64 @@
+@page "/calculator"
+@rendermode InteractiveServer
+
+<h2>Blazor kalkulačka</h2>
+
+<div>
+
+    <label>První číslo:</label><br />
+    <input type="number" @bind="firstNumber" />
+
+    <br /><br />
+
+    <label>Druhé číslo:</label><br />
+    <input type="number" @bind="secondNumber" />
+
+    <br /><br />
+
+    <label>Operace:</label><br />
+    <select @bind="selectedOperation">
+        @foreach (var op in operations)
+        {
+            <option value="@op">@op</option>
+        }
+    </select>
+
+    <br /><br />
+
+    <button @onclick="Spocitej">Spočítej</button>
+
+    <br /><br />
+
+    <h3>Výsledek je: @resultText</h3>
+
+</div>
+
+@code {
+
+    private double firstNumber = 0;
+    private double secondNumber = 0;
+    private string selectedOperation = "+";
+    private string resultText = "";
+
+    private readonly string[] operations = new[] { "+", "-", "*", "/" };
+
+    private void Spocitej()
+    {
+        double result = selectedOperation switch
+        {
+            "+" => Add(firstNumber, secondNumber),
+            "-" => Subtract(firstNumber, secondNumber),
+            "*" => Multiply(firstNumber, secondNumber),
+            "/" => Divide(firstNumber, secondNumber),
+            _ => double.NaN
+        };
+
+        resultText = result.ToString();
+    }
+
+    private double Add(double a, double b) => a + b;
+    private double Subtract(double a, double b) => a - b;
+    private double Multiply(double a, double b) => a * b;
+    private double Divide(double a, double b) => b == 0 ? double.NaN : a / b;
+
+}
