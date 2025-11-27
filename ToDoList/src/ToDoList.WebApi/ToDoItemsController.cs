@@ -12,7 +12,7 @@ using ToDoList.Persistence.Repositories;
 /// Controller pro správu ToDo položek.
 /// localhost:5000/api/ToDoItems
 /// </summary>
-[Route("api/[controller]")]
+[Route("api/todoitems")]
 [ApiController]
 
 public class ToDoItemsController : ControllerBase
