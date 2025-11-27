@@ -25,7 +25,7 @@ public class UpdateTests
             IsCompleted = false
         };
 
-        var updateRequest = new ToDoItemUpdateRequestDto("Jmeno2", "Popis2", true);
+        var updateRequest = new ToDoItemUpdateRequestDto("Jmeno2", "Popis2", true, "Category2");
 
         repositoryMock.ReadById(1).Returns(todoItem);
 
@@ -39,6 +39,7 @@ public class UpdateTests
             item.ToDoItemId == 1 &&
             item.Name == "Jmeno2" &&
             item.Description == "Popis2" &&
+            item.Category == "Category2" &&
             item.IsCompleted == true
         ));
     }
@@ -50,7 +51,7 @@ public class UpdateTests
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
 
-        var updateRequest = new ToDoItemUpdateRequestDto("NonExisting", "Attempt to update", false);
+        var updateRequest = new ToDoItemUpdateRequestDto("NonExisting", "Attempt to update", false, null);
 
         repositoryMock.ReadById(Arg.Any<int>()).Returns((ToDoItem?)null);
         // Act

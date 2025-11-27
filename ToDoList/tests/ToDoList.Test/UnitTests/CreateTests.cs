@@ -16,7 +16,7 @@ public class CreateTests
         //Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
-        var createRequest = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false);
+        var createRequest = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false, "Category1");
 
         // Simulujeme chování EF – po zavolání Create se novému objektu přidělí ID 1
         repositoryMock
@@ -35,6 +35,7 @@ public class CreateTests
         var value = Assert.IsType<ToDoItemGetResponseDto>(result.Value);
         Assert.Equal("Jmeno1", value!.Name);
         Assert.Equal("Popis1", value.Description);
+        Assert.Equal("Category1", value.Category);
         Assert.False(value.IsCompleted);
         Assert.Equal(1, value.Id);
 
@@ -48,7 +49,7 @@ public class CreateTests
         // Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
-        var createRequest = new ToDoItemCreateRequestDto(null!, "Popis bez jména", false);
+        var createRequest = new ToDoItemCreateRequestDto(null!, "Popis bez jména", false, null);
 
         // Act
         var result = controller.Create(createRequest);

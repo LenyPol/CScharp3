@@ -17,14 +17,16 @@ public class GetTests : ToDoListControllerTestBase
             ToDoItemId = 1,
             Name = "Jmeno1",
             Description = "Popis1",
-            IsCompleted = false
+            IsCompleted = false,
+            Category = "Category1"
         };
         var todoItem2 = new ToDoItem
         {
             ToDoItemId = 2,
             Name = "Jmeno2",
             Description = "Popis2",
-            IsCompleted = true
+            IsCompleted = true,
+            Category = "Category2"
         };
 
         DbContext.ToDoItems.AddRange(todoItem1, todoItem2);
@@ -43,6 +45,7 @@ public class GetTests : ToDoListControllerTestBase
         var firstToDo = value.First();
         Assert.Equal("Jmeno1", firstToDo.Name);
         Assert.Equal("Popis1", firstToDo.Description);
+        Assert.Equal("Category1", firstToDo.Category);
         Assert.False(firstToDo.IsCompleted);
     }
     [Fact]
@@ -53,7 +56,8 @@ public class GetTests : ToDoListControllerTestBase
         {
             Name = "Jmeno1",
             Description = "Popis1",
-            IsCompleted = false
+            IsCompleted = false,
+            Category = "Category1"
         };
 
         DbContext.ToDoItems.Add(todoItem);
@@ -71,6 +75,7 @@ public class GetTests : ToDoListControllerTestBase
         Assert.Equal(todoItem.ToDoItemId, value!.Id);
         Assert.Equal(todoItem.Name, value.Name);
         Assert.Equal(todoItem.Description, value.Description);
+        Assert.Equal(todoItem.Category, value.Category);
         Assert.Equal(todoItem.IsCompleted, value.IsCompleted);
     }
     [Fact]

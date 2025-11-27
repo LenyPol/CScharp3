@@ -24,7 +24,7 @@ public class UpdateTests : ToDoListControllerTestBase
         DbContext.SaveChanges();
         var id = todoItem.ToDoItemId;
 
-        var updateRequest = new ToDoItemUpdateRequestDto("Jmeno2", "Popis2", true);
+        var updateRequest = new ToDoItemUpdateRequestDto("Jmeno2", "Popis2", true, "Category2");
 
         // Act
         var result = Controller.UpdateById(id, updateRequest);
@@ -36,13 +36,14 @@ public class UpdateTests : ToDoListControllerTestBase
         Assert.NotNull(updateItem);
         Assert.Equal("Jmeno2", updateItem!.Name);
         Assert.Equal("Popis2", updateItem.Description);
+        Assert.Equal("Category2", updateItem.Category);
         Assert.True(updateItem.IsCompleted);
     }
     [Fact]
     public void Update_NonExistingItem_ReturnsNotFound()
     {
         // Arrange
-        var updateRequest = new ToDoItemUpdateRequestDto("NonExisting", "Attempt to update", false);
+        var updateRequest = new ToDoItemUpdateRequestDto("NonExisting", "Attempt to update", false, null);
 
         // Act
         var result = Controller.UpdateById(999, updateRequest);

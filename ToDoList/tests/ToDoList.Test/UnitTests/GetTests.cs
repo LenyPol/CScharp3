@@ -21,14 +21,16 @@ public class GetTests
             ToDoItemId = 1,
             Name = "Jmeno1",
             Description = "Popis1",
-            IsCompleted = false
+            IsCompleted = false,
+            Category = "Category1"
         };
         var todoItem2 = new ToDoItem
         {
             ToDoItemId = 2,
             Name = "Jmeno2",
             Description = "Popis2",
-            IsCompleted = true
+            IsCompleted = true,
+            Category = "Category2"
         };
 
         repositoryMock.ReadAll().Returns(new List<ToDoItem> { todoItem1, todoItem2 });
@@ -46,6 +48,7 @@ public class GetTests
         var firstToDo = value.First();
         Assert.Equal("Jmeno1", firstToDo.Name);
         Assert.Equal("Popis1", firstToDo.Description);
+        Assert.Equal("Category1", firstToDo.Category);
         Assert.False(firstToDo.IsCompleted);
 
         repositoryMock.Received(1).ReadAll();
@@ -62,7 +65,8 @@ public class GetTests
             ToDoItemId = 1,
             Name = "Jmeno1",
             Description = "Popis1",
-            IsCompleted = false
+            IsCompleted = false,
+            Category = "Category1"
         };
 
         repositoryMock.ReadById(1).Returns(todoItem);
@@ -78,6 +82,7 @@ public class GetTests
         Assert.Equal(1, value!.Id);
         Assert.Equal("Jmeno1", value.Name);
         Assert.Equal("Popis1", value.Description);
+        Assert.Equal("Category1", value.Category);
         Assert.False(value.IsCompleted);
 
         repositoryMock.Received(1).ReadById(1);

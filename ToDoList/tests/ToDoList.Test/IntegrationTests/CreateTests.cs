@@ -14,7 +14,7 @@ public class CreateTests : ToDoListControllerTestBase
     public void Create_ValidItem_ReturnCreatedItem()
     {
         //Arrange
-        var createRequest = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false);
+        var createRequest = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false, "Category1");
 
         // Act
         var result = Controller.Create(createRequest) as CreatedAtActionResult;
@@ -27,6 +27,7 @@ public class CreateTests : ToDoListControllerTestBase
 
         Assert.Equal("Jmeno1", value!.Name);
         Assert.Equal("Popis1", value.Description);
+        Assert.Equal("Category1", value.Category);
         Assert.False(value.IsCompleted);
         Assert.True(value.Id > 0);
 
@@ -34,6 +35,7 @@ public class CreateTests : ToDoListControllerTestBase
         Assert.NotNull(entity);
         Assert.Equal(value.Name, entity!.Name);
         Assert.Equal(value.Description, entity.Description);
+        Assert.Equal(value.Category, entity.Category);
         Assert.False(entity.IsCompleted);
 
     }
@@ -41,8 +43,8 @@ public class CreateTests : ToDoListControllerTestBase
     public void Create_MultipleItems_AssignsIncrementalIds()
     {
         // Arrange
-        var item1 = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false);
-        var item2 = new ToDoItemCreateRequestDto("Jmeno2", "Popis2", true);
+        var item1 = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false, "Category1");
+        var item2 = new ToDoItemCreateRequestDto("Jmeno2", "Popis2", true, "Category2");
 
         // Act
         var result1 = Controller.Create(item1) as CreatedAtActionResult;
@@ -67,7 +69,7 @@ public class CreateTests : ToDoListControllerTestBase
     public void Create_WhenExceptionOccurs_ReturnsProblem()
     {
         // Arrange
-        var createRequest = new ToDoItemCreateRequestDto(null!, "Popis bez jména", false);
+        var createRequest = new ToDoItemCreateRequestDto(null!, "Popis bez jména", false, null);
 
         // Act
         var result = Controller.Create(createRequest);
