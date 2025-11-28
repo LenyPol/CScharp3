@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
-using ToDoList.WebApi;
-using System.Reflection;
+
 
 namespace ToDoList.Test.IntegrationTests;
 
@@ -10,7 +9,7 @@ public class UpdateTests : ToDoListControllerTestBase
 {
 
     [Fact]
-    public void Update_ExistingItem_ReturnsNoContent_UpdateItem()
+    public async Task Update_ExistingItem_ReturnsNoContent_UpdateItem()
     {
         //Arrange
         var todoItem = new ToDoItem
@@ -27,7 +26,7 @@ public class UpdateTests : ToDoListControllerTestBase
         var updateRequest = new ToDoItemUpdateRequestDto("Jmeno2", "Popis2", true, "Category2");
 
         // Act
-        var result = Controller.UpdateById(id, updateRequest);
+        var result = await Controller.UpdateById(id, updateRequest);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
@@ -40,13 +39,13 @@ public class UpdateTests : ToDoListControllerTestBase
         Assert.True(updateItem.IsCompleted);
     }
     [Fact]
-    public void Update_NonExistingItem_ReturnsNotFound()
+    public async Task Update_NonExistingItem_ReturnsNotFound()
     {
         // Arrange
         var updateRequest = new ToDoItemUpdateRequestDto("NonExisting", "Attempt to update", false, null);
 
         // Act
-        var result = Controller.UpdateById(999, updateRequest);
+        var result = await Controller.UpdateById(999, updateRequest);
 
         // Assert
         Assert.IsType<NotFoundResult>(result);

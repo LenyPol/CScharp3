@@ -3,6 +3,7 @@ using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 using ToDoList.WebApi;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace ToDoList.Test.IntegrationTests;
 
@@ -11,13 +12,13 @@ public class CreateTests : ToDoListControllerTestBase
 {
 
     [Fact]
-    public void Create_ValidItem_ReturnCreatedItem()
+    public async Task Create_ValidItem_ReturnCreatedItem()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false, "Category1");
 
         // Act
-        var result = Controller.Create(createRequest) as CreatedAtActionResult;
+        var result = await Controller.Create(createRequest) as CreatedAtActionResult;
 
         // Assert
         Assert.NotNull(result);
@@ -40,15 +41,15 @@ public class CreateTests : ToDoListControllerTestBase
 
     }
     [Fact]
-    public void Create_MultipleItems_AssignsIncrementalIds()
+    public async Task Create_MultipleItems_AssignsIncrementalIds()
     {
         // Arrange
         var item1 = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false, "Category1");
         var item2 = new ToDoItemCreateRequestDto("Jmeno2", "Popis2", true, "Category2");
 
         // Act
-        var result1 = Controller.Create(item1) as CreatedAtActionResult;
-        var result2 = Controller.Create(item2) as CreatedAtActionResult;
+        var result1 = await Controller.Create(item1) as CreatedAtActionResult;
+        var result2 = await Controller.Create(item2) as CreatedAtActionResult;
 
         // Assert
         Assert.NotNull(result1);
@@ -66,13 +67,13 @@ public class CreateTests : ToDoListControllerTestBase
     }
 
     [Fact]
-    public void Create_WhenExceptionOccurs_ReturnsProblem()
+    public async Task Create_WhenExceptionOccurs_ReturnsProblem()
     {
         // Arrange
         var createRequest = new ToDoItemCreateRequestDto(null!, "Popis bez jména", false, null);
 
         // Act
-        var result = Controller.Create(createRequest);
+        var result = await Controller.Create(createRequest);
 
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);

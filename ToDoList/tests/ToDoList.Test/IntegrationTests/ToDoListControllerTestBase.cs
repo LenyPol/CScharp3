@@ -1,4 +1,3 @@
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using ToDoList.Domain.Models;
 using ToDoList.Persistence;
@@ -13,7 +12,7 @@ public abstract class ToDoListControllerTestBase : IDisposable
 {
     protected readonly ToDoItemsContext DbContext;
     protected readonly ToDoItemsController Controller;
-    protected readonly IRepository<ToDoItem> Repository;
+    protected readonly IRepositoryAsync<ToDoItem> Repository;
 
 
     protected ToDoListControllerTestBase()

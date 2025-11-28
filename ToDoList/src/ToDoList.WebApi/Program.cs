@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
         options.UseSqlite("Data Source=../../data/localdb.db");
     });
 
-    builder.Services.AddScoped<IRepository<ToDoItem>, ToDoItemsRepository>();
+    builder.Services.AddScoped<IRepositoryAsync<ToDoItem>, ToDoItemsRepository>();
 }
 var app = builder.Build();
 {

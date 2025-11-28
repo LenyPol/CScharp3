@@ -11,10 +11,10 @@ public class UpdateTests
 {
 
     [Fact]
-    public void Put_UpdateByIdWhenItemUpdated_ReturnsNoContent()
+    public async Task Put_UpdateByIdWhenItemUpdated_ReturnsNoContent()
     {
         //Arrange
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
 
         var todoItem = new ToDoItem
@@ -30,7 +30,7 @@ public class UpdateTests
         repositoryMock.ReadById(1).Returns(todoItem);
 
         // Act
-        var result = controller.UpdateById(1, updateRequest);
+        var result = await controller.UpdateById(1, updateRequest);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
@@ -45,17 +45,17 @@ public class UpdateTests
     }
 
     [Fact]
-    public void Put_UpdateByIdWhenIdNotFound_ReturnsNotFound()
+    public async Task Put_UpdateByIdWhenIdNotFound_ReturnsNotFound()
     {
         // Arrange
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
 
         var updateRequest = new ToDoItemUpdateRequestDto("NonExisting", "Attempt to update", false, null);
 
         repositoryMock.ReadById(Arg.Any<int>()).Returns((ToDoItem?)null);
         // Act
-        var result = controller.UpdateById(999, updateRequest);
+        var result = await controller.UpdateById(999, updateRequest);
 
         // Assert
         Assert.IsType<NotFoundResult>(result);
