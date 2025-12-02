@@ -17,9 +17,9 @@ using ToDoList.Persistence.Repositories;
 
 public class ToDoItemsController : ControllerBase
 {
-    private readonly IRepository<ToDoItem> repository;
+    private readonly IRepositoryAsync<ToDoItem> repository;
 
-    public ToDoItemsController(IRepository<ToDoItem> repository)
+    public ToDoItemsController(IRepositoryAsync<ToDoItem> repository)
     {
         this.repository = repository;
     }
@@ -32,7 +32,7 @@ public class ToDoItemsController : ControllerBase
     /// nebo chybu 500 při selhání.
     /// </returns>
     [HttpPost]
-    public IActionResult Create([FromBody] ToDoItemCreateRequestDto request)
+    public async Task<IActionResult> Create([FromBody] ToDoItemCreateRequestDto request)
     {
         try
         {
@@ -41,7 +41,7 @@ public class ToDoItemsController : ControllerBase
 
             var item = request.ToDomain();
 
-            repository.Create(item);
+            await repository.Create(item);
 
             return CreatedAtAction(
                 nameof(ReadById),
@@ -62,11 +62,11 @@ public class ToDoItemsController : ControllerBase
     /// nebo <see cref="NotFoundResult"/>, pokud seznam neexistuje.
     /// </returns>
     [HttpGet]
-    public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
+    public async Task<ActionResult<IEnumerable<ToDoItemGetResponseDto>>> Read()
     {
         try
         {
-            var items = repository.ReadAll();
+            var items = await repository.ReadAll();
 
             var response = items
                 .Select(ToDoItemGetResponseDto.FromDomain)
@@ -88,11 +88,11 @@ public class ToDoItemsController : ControllerBase
     /// nebo <see cref="NotFoundResult"/>, pokud neexistuje.
     /// </returns>
     [HttpGet("{toDoItemId:int}")]
-    public IActionResult ReadById(int toDoItemId)
+    public async Task<IActionResult> ReadById(int toDoItemId)
     {
         try
         {
-            var item = repository.ReadById(toDoItemId);
+            var item = await repository.ReadById(toDoItemId);
 
             if (item is null)
                 return NotFound();
@@ -114,11 +114,11 @@ public class ToDoItemsController : ControllerBase
     /// nebo <see cref="NotFoundResult"/>, pokud položka neexistuje.
     /// </returns>
     [HttpPut("{toDoItemId:int}")]
-    public IActionResult UpdateById(int toDoItemId, [FromBody] ToDoItemUpdateRequestDto request)
+    public async Task<IActionResult> UpdateById(int toDoItemId, [FromBody] ToDoItemUpdateRequestDto request)
     {
         try
         {
-            var item = repository.ReadById(toDoItemId);
+            var item = await repository.ReadById(toDoItemId);
             if (item is null)
                 return NotFound();
 
@@ -127,7 +127,7 @@ public class ToDoItemsController : ControllerBase
             item.IsCompleted = request.IsCompleted;
             item.Category = request.Category;
 
-            repository.Update(item);
+            await repository.Update(item);
 
             return NoContent();
         }
@@ -145,15 +145,15 @@ public class ToDoItemsController : ControllerBase
     /// nebo <see cref="NotFoundResult"/>, 404 pokud neexistuje.
     /// </returns>
     [HttpDelete("{toDoItemId:int}")]
-    public IActionResult DeleteById(int toDoItemId)
+    public async Task<IActionResult> DeleteById(int toDoItemId)
     {
         try
         {
-            var item = repository.ReadById(toDoItemId);
+            var item = await repository.ReadById(toDoItemId);
             if (item is null)
                 return NotFound();
 
-            repository.Delete(item);
+            await repository.Delete(item);
             return NoContent();
         }
         catch (Exception ex)

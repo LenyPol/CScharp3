@@ -10,11 +10,12 @@ public class DeleteTests
 {
 
     [Fact]
-    public void Delete_DeleteByIdValidItemId_ReturnsNoContent()
+    public async Task Delete_DeleteByIdValidItemId_ReturnsNoContent()
     {
         //Arrange
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
+
         var todoItem = new ToDoItem
         {
             ToDoItemId = 1,
@@ -23,41 +24,41 @@ public class DeleteTests
             IsCompleted = false
         };
 
-        repositoryMock.ReadById(1).Returns(todoItem);
+        repositoryMock.ReadById(1).Returns(Task.FromResult(todoItem));
+        repositoryMock.Delete(todoItem).Returns(Task.CompletedTask);
 
         // Act
-        var result = controller.DeleteById(1);
+        var result = await controller.DeleteById(1);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
-
-        repositoryMock.Received(1).Delete(todoItem);
+        await repositoryMock.Received(1).Delete(todoItem);
     }
 
     [Fact]
-    public void Delete_DeleteByIdInvalidItemId_ReturnsNotFound()
+    public async Task Delete_DeleteByIdInvalidItemId_ReturnsNotFound()
     {
         // Arrange
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
 
-        repositoryMock.ReadById(999).Returns((ToDoItem?)null);
+        repositoryMock.ReadById(999).Returns(Task.FromResult<ToDoItem?>(null));
 
         // Act
-        var result = controller.DeleteById(999);
+        var result = await controller.DeleteById(999);
 
         // Assert
         Assert.IsType<NotFoundResult>(result);
-
-        repositoryMock.DidNotReceive().Delete(Arg.Any<ToDoItem>());
+        await repositoryMock.DidNotReceive().Delete(Arg.Any<ToDoItem>());
     }
 
     [Fact]
-    public void Delete_DeleteByIdUnhandledException_ReturnsInternalServerError()
+    public async Task Delete_DeleteByIdUnhandledException_ReturnsInternalServerError()
     {
         // Arrange
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
+
         var todoItem = new ToDoItem
         {
             ToDoItemId = 10,
@@ -66,19 +67,20 @@ public class DeleteTests
             IsCompleted = false
         };
 
-        repositoryMock.ReadById(10).Returns(todoItem);
+        repositoryMock.ReadById(10).Returns(Task.FromResult(todoItem));
+
         repositoryMock
-            .When(r => r.Delete(todoItem))
-            .Do(_ => throw new Exception("Simulated DB error"));
+            .Delete(todoItem)
+            .Returns<Task>(_ => throw new Exception("Simulated DB error"));
 
         // Act
-        var result = controller.DeleteById(10);
+        var result = await controller.DeleteById(10);
 
         // Assert
         var problemResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(500, problemResult.StatusCode);
 
-        repositoryMock.Received(1).ReadById(10);
-        repositoryMock.Received(1).Delete(todoItem);
+        await repositoryMock.Received(1).ReadById(10);
+        await repositoryMock.Received(1).Delete(todoItem);
     }
 }

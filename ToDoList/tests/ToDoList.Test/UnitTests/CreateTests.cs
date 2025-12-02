@@ -4,6 +4,7 @@ using ToDoList.Domain.Models;
 using ToDoList.WebApi;
 using NSubstitute;
 using ToDoList.Persistence.Repositories;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace ToDoList.Test.UnitTests;
 
@@ -11,10 +12,10 @@ public class CreateTests
 {
 
     [Fact]
-    public void Post_CreateValidRequest_ReturnsCreatedAtAction()
+    public async Task Post_CreateValidRequest_ReturnsCreatedAtAction()
     {
         //Arrange
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
         var createRequest = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false, "Category1");
 
@@ -23,10 +24,11 @@ public class CreateTests
         .Create(Arg.Do<ToDoItem>(item =>
         {
             item.ToDoItemId = 1;   //  nastaví ID do objektu vytvořeného v kontroleru
-        }));
+        }))
+        .Returns(Task.CompletedTask);
 
         // Act
-        var result = controller.Create(createRequest) as CreatedAtActionResult;
+        var result = await controller.Create(createRequest) as CreatedAtActionResult;
 
         // Assert
         Assert.NotNull(result);
@@ -44,15 +46,15 @@ public class CreateTests
     }
 
     [Fact]
-    public void Post_CreateInvalidRequest_ReturnsBadRequest()
+    public async Task Post_CreateInvalidRequest_ReturnsBadRequest()
     {
         // Arrange
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
         var createRequest = new ToDoItemCreateRequestDto(null!, "Popis bez jména", false, null);
 
         // Act
-        var result = controller.Create(createRequest);
+        var result = await controller.Create(createRequest);
 
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);

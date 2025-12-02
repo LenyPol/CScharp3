@@ -3,41 +3,41 @@ namespace ToDoList.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using ToDoList.Domain.Models;
 
-public class ToDoItemsRepository(ToDoItemsContext dbContext) : IRepository<ToDoItem>
+public class ToDoItemsRepository(ToDoItemsContext dbContext) : IRepositoryAsync<ToDoItem>
 {
-    public void Create(ToDoItem item)
+    public async Task Create(ToDoItem item)
     {
         dbContext.ToDoItems.Add(item);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
     }
-    public IEnumerable<ToDoItem> ReadAll()
+    public async Task<IEnumerable<ToDoItem>> ReadAll()
     {
-        return dbContext.ToDoItems
+        return await dbContext.ToDoItems
             .AsNoTracking()
-            .ToList();
+            .ToListAsync();
     }
-    public ToDoItem? ReadById(int id)
+    public async Task<ToDoItem?> ReadById(int id)
     {
-        return dbContext.ToDoItems
+        return await dbContext.ToDoItems
             .AsNoTracking()
-            .SingleOrDefault(i => i.ToDoItemId == id);
+            .SingleOrDefaultAsync(i => i.ToDoItemId == id);
     }
-    public void Update(ToDoItem item)
+    public async Task Update(ToDoItem item)
     {
-        var existing = dbContext.ToDoItems.Find(item.ToDoItemId);
+        var existing = await dbContext.ToDoItems.FindAsync(item.ToDoItemId);
         if (existing is null)
             return;
 
         dbContext.Entry(existing).CurrentValues.SetValues(item);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
     }
-    public void Delete(ToDoItem item)
+    public async Task Delete(ToDoItem item)
     {
-        var existing = dbContext.ToDoItems.Find(item.ToDoItemId);
+        var existing = await dbContext.ToDoItems.FindAsync(item.ToDoItemId);
         if (existing != null)
         {
             dbContext.ToDoItems.Remove(existing);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
     }
 }

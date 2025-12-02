@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.Models;
 using ToDoList.WebApi;
-using System.Reflection;
+
 
 namespace ToDoList.Test.IntegrationTests;
 
@@ -9,7 +9,7 @@ public class DeleteTests : ToDoListControllerTestBase
 {
 
     [Fact]
-    public void Delete_ExistingItem_ReturnsNoContent()
+    public async Task Delete_ExistingItem_ReturnsNoContent()
     {
         //Arrange
         var todoItem = new ToDoItem
@@ -23,7 +23,7 @@ public class DeleteTests : ToDoListControllerTestBase
         DbContext.SaveChanges();
 
         // Act
-        var result = Controller.DeleteById(todoItem.ToDoItemId);
+        var result = await Controller.DeleteById(todoItem.ToDoItemId);
 
         // Assert
         Assert.IsType<NoContentResult>(result);
@@ -33,17 +33,17 @@ public class DeleteTests : ToDoListControllerTestBase
     }
 
     [Fact]
-    public void Delete_NonExistingItem_ReturnsNotFound()
+    public async Task Delete_NonExistingItem_ReturnsNotFound()
     {
         // Act
-        var result = Controller.DeleteById(999);
+        var result = await Controller.DeleteById(999);
 
         // Assert
         Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact]
-    public void Delete_RemovesItemFromStorage()
+    public async Task Delete_RemovesItemFromStorage()
     {
         // Arrange
         var todoItem = new ToDoItem
@@ -57,7 +57,7 @@ public class DeleteTests : ToDoListControllerTestBase
         DbContext.SaveChanges();
 
         // Act
-        Controller.DeleteById(todoItem.ToDoItemId);
+        await Controller.DeleteById(todoItem.ToDoItemId);
 
         // Assert
         var items = DbContext.ToDoItems.ToList();

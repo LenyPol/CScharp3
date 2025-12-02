@@ -5,16 +5,17 @@ using ToDoList.WebApi;
 using NSubstitute;
 using ToDoList.Persistence.Repositories;
 
+
 namespace ToDoList.Test.UnitTests;
 
 public class GetTests
 {
 
     [Fact]
-    public void Get_ReadWhenSomeItemAvailable_ReturnsOk()
+    public async Task Get_ReadWhenSomeItemAvailable_ReturnsOk()
     {
         // Arrange
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
         var todoItem1 = new ToDoItem
         {
@@ -33,10 +34,12 @@ public class GetTests
             Category = "Category2"
         };
 
-        repositoryMock.ReadAll().Returns(new List<ToDoItem> { todoItem1, todoItem2 });
+        repositoryMock.ReadAll().Returns(Task.FromResult<IEnumerable<ToDoItem>>(
+            new List<ToDoItem> { todoItem1, todoItem2 }
+        ));
 
         // Act
-        var actionResult = controller.Read();
+        var actionResult = await controller.Read();
         var result = actionResult.Result as OkObjectResult;
 
         // Assert
@@ -54,10 +57,10 @@ public class GetTests
         repositoryMock.Received(1).ReadAll();
     }
     [Fact]
-    public void Get_ReadByIdWhenSomeItemAvailable_ReturnsOk()
+    public async Task Get_ReadByIdWhenSomeItemAvailable_ReturnsOk()
     {
         // Arrange
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
 
         var todoItem = new ToDoItem
@@ -69,10 +72,10 @@ public class GetTests
             Category = "Category1"
         };
 
-        repositoryMock.ReadById(1).Returns(todoItem);
+        repositoryMock.ReadById(1).Returns(Task.FromResult(todoItem));
 
         // Act
-        var result = controller.ReadById(todoItem.ToDoItemId) as OkObjectResult;
+        var result = await controller.ReadById(todoItem.ToDoItemId) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -89,20 +92,19 @@ public class GetTests
     }
 
     [Fact]
-    public void Get_ReadByIdWhenItemIsNull_ReturnsNotFound()
+    public async Task Get_ReadByIdWhenItemIsNull_ReturnsNotFound()
     {
         // Arrange
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
 
         repositoryMock.ReadById(Arg.Any<int>()).Returns((ToDoItem?)null);
 
         // Act
-        var result = controller.ReadById(9999);
+        var result = await controller.ReadById(9999);
 
         // Assert
         Assert.IsType<NotFoundResult>(result);
-
         repositoryMock.Received(1).ReadById(Arg.Any<int>());
     }
 }

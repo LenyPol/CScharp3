@@ -3,13 +3,12 @@ namespace ToDoList.Test.IntegrationTests;
 using ToDoList.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.Models;
-using ToDoList.WebApi;
 
 public class GetTests : ToDoListControllerTestBase
 {
 
     [Fact]
-    public void Get_AllItems_ReturnsAllItems()
+    public async Task Get_AllItems_ReturnsAllItems()
     {
         // Arrange
         var todoItem1 = new ToDoItem
@@ -33,7 +32,7 @@ public class GetTests : ToDoListControllerTestBase
         DbContext.SaveChanges();
 
         // Act
-        var actionResult = Controller.Read();
+        var actionResult = await Controller.Read();
         var result = actionResult.Result as OkObjectResult;
 
         // Assert
@@ -49,7 +48,7 @@ public class GetTests : ToDoListControllerTestBase
         Assert.False(firstToDo.IsCompleted);
     }
     [Fact]
-    public void Get_ById_ReturnsCorrectItem()
+    public async Task Get_ById_ReturnsCorrectItem()
     {
         // Arrange
         var todoItem = new ToDoItem
@@ -65,7 +64,7 @@ public class GetTests : ToDoListControllerTestBase
 
         var id = todoItem.ToDoItemId;
         // Act
-        var result = Controller.ReadById(todoItem.ToDoItemId) as OkObjectResult;
+        var result = await Controller.ReadById(todoItem.ToDoItemId) as OkObjectResult;
 
         // Assert
         Assert.NotNull(result);
@@ -79,10 +78,10 @@ public class GetTests : ToDoListControllerTestBase
         Assert.Equal(todoItem.IsCompleted, value.IsCompleted);
     }
     [Fact]
-    public void Get_ById_NonExisting_ReturnsNotFound()
+    public async Task Get_ById_NonExisting_ReturnsNotFound()
     {
         // Act
-        var result = Controller.ReadById(9999);
+        var result = await Controller.ReadById(9999);
 
         // Assert
         Assert.IsType<NotFoundResult>(result);
