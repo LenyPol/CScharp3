@@ -54,7 +54,7 @@ public class GetTests
         Assert.Equal("Category1", firstToDo.Category);
         Assert.False(firstToDo.IsCompleted);
 
-        repositoryMock.Received(1).ReadAll();
+        await repositoryMock.Received(1).ReadAll();
     }
     [Fact]
     public async Task Get_ReadByIdWhenSomeItemAvailable_ReturnsOk()
@@ -72,7 +72,7 @@ public class GetTests
             Category = "Category1"
         };
 
-        repositoryMock.ReadById(1).Returns(Task.FromResult(todoItem));
+        repositoryMock.ReadById(1).Returns(Task.FromResult<ToDoItem?>(todoItem));
 
         // Act
         var result = await controller.ReadById(todoItem.ToDoItemId) as OkObjectResult;
@@ -88,7 +88,7 @@ public class GetTests
         Assert.Equal("Category1", value.Category);
         Assert.False(value.IsCompleted);
 
-        repositoryMock.Received(1).ReadById(1);
+        await repositoryMock.Received(1).ReadById(1);
     }
 
     [Fact]
@@ -98,13 +98,14 @@ public class GetTests
         var repositoryMock = Substitute.For<IRepositoryAsync<ToDoItem>>();
         var controller = new ToDoItemsController(repositoryMock);
 
-        repositoryMock.ReadById(Arg.Any<int>()).Returns((ToDoItem?)null);
+        repositoryMock.ReadById(Arg.Any<int>())
+            .Returns(Task.FromResult<ToDoItem?>(null));
 
         // Act
         var result = await controller.ReadById(9999);
 
         // Assert
         Assert.IsType<NotFoundResult>(result);
-        repositoryMock.Received(1).ReadById(Arg.Any<int>());
+        await repositoryMock.Received(1).ReadById(Arg.Any<int>());
     }
 }

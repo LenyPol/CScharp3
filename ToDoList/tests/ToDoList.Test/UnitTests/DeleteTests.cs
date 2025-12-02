@@ -24,7 +24,7 @@ public class DeleteTests
             IsCompleted = false
         };
 
-        repositoryMock.ReadById(1).Returns(Task.FromResult(todoItem));
+        repositoryMock.ReadById(1).Returns(Task.FromResult<ToDoItem?>(todoItem));
         repositoryMock.Delete(todoItem).Returns(Task.CompletedTask);
 
         // Act
@@ -67,7 +67,7 @@ public class DeleteTests
             IsCompleted = false
         };
 
-        repositoryMock.ReadById(10).Returns(Task.FromResult(todoItem));
+        repositoryMock.ReadById(10).Returns(Task.FromResult<ToDoItem?>(todoItem));
 
         repositoryMock
             .Delete(todoItem)

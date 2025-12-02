@@ -27,7 +27,7 @@ public class UpdateTests
 
         var updateRequest = new ToDoItemUpdateRequestDto("Jmeno2", "Popis2", true, "Category2");
 
-        repositoryMock.ReadById(1).Returns(todoItem);
+        repositoryMock.ReadById(1).Returns(Task.FromResult<ToDoItem?>(todoItem));
 
         // Act
         var result = await controller.UpdateById(1, updateRequest);
@@ -35,7 +35,7 @@ public class UpdateTests
         // Assert
         Assert.IsType<NoContentResult>(result);
 
-        repositoryMock.Received(1).Update(Arg.Is<ToDoItem>(item =>
+        await repositoryMock.Received(1).Update(Arg.Is<ToDoItem>(item =>
             item.ToDoItemId == 1 &&
             item.Name == "Jmeno2" &&
             item.Description == "Popis2" &&
@@ -60,6 +60,6 @@ public class UpdateTests
         // Assert
         Assert.IsType<NotFoundResult>(result);
 
-        repositoryMock.DidNotReceive().Update(Arg.Any<ToDoItem>());
+        await repositoryMock.DidNotReceive().Update(Arg.Any<ToDoItem>());
     }
 }

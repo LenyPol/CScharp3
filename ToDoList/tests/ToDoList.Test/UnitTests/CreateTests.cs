@@ -41,7 +41,7 @@ public class CreateTests
         Assert.False(value.IsCompleted);
         Assert.Equal(1, value.Id);
 
-        repositoryMock.Received(1).Create(Arg.Any<ToDoItem>());
+        await repositoryMock.Received(1).Create(Arg.Any<ToDoItem>());
 
     }
 
@@ -62,6 +62,6 @@ public class CreateTests
         Assert.Equal("Name cannot be null or empty.", badRequestResult.Value);
 
         //ověřuje, že controller nepokračoval k repository
-        repositoryMock.DidNotReceive().Create(Arg.Any<ToDoItem>());
+        await repositoryMock.DidNotReceive().Create(Arg.Any<ToDoItem>());
     }
 }
