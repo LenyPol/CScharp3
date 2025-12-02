@@ -22,7 +22,7 @@ public class DeleteTests
             Description = "Popis",
             IsCompleted = false
         };
-        repositoryMock.ReadById(1).Returns(toDoItem);
+        repositoryMock.ReadById(1) .Returns(Task.FromResult<ToDoItem?>(todoItem));
 
         // Act
         var result = controller.DeleteById(1);
