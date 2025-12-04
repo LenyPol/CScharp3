@@ -2,25 +2,38 @@
 @using ToDoList.Frontend.Clients
 @using ToDoList.Frontend.Models
 @inject NavigationManager NavigationManager
+@inject IToDoItemsClient toDoItemsClient
 
 @rendermode InteractiveServer
 
-<b>@ItemId</b>
+@if (ToDoItemModel is not null)
+{
+    <EditForm Model="ToDoItemModel" FormName="EditToDoItem" OnSubmit="Submit">
+        <div class="mb-3">
+            <label for="Name" class="form-label">Name</label>
+            <InputText id="Name" @bind-Value="ToDoItemModel.Name" class="form-control" />
+        </div>
+        <InputText id="Description" @bind-Value="ToDoItemModel.Description" />
+        <InputCheckbox id="IsCompleted" @bind-Value="ToDoItemModel.IsCompleted" />
+        <button type="submit">Odeslat</button>
+    </EditForm>
+}
 
 @code {
-
     protected override async Task OnInitializedAsync()
     {
-
+        ToDoItemModel = await toDoItemsClient.ReadItemByIdAsync(ItemId);
     }
+
     [Parameter]
     public int ItemId { get; set; }
 
     [SupplyParameterFromForm]
-    public ToDoItemView TodoItemModel { get; set; }
+    public ToDoItemView ToDoItemModel { get; set; }
 
     public async Task Submit()
     {
-        await Task.Delay(millisecondsDelay: 500);
+        await toDoItemsClient.UpdateItemAsync(ToDoItemModel);
+        NavigationManager.NavigateTo("/");
     }
 }

@@ -11,18 +11,10 @@
     <table class="table table-hover mt-3">
         <thead class="table-dark">
             <tr>
-                <th>
-                    <button class="btn btn-secondary" @onclick="OrderById">Sort by Id</button>
-                </th>
-                <th>
-                    <button class="btn btn-primary" @onclick="OrderByName">Sort by Name</button>
-                </th>
-                <th>
-                    <button class="btn btn-primary" @onclick="OrderByDescription">Sort by Description</button>
-                </th>
-                <th>
-                    <button class="btn btn-primary" @onclick="OrderByIsCompleted">Sort by Completed</button>
-                </th>
+                <th><button class="btn btn-secondary" @onclick="OrderById">Sort by Id</button></th>
+                <th><button class="btn btn-primary" @onclick="OrderByName">Sort by Name</button></th>
+                <th>Description</th>
+                <th>IsCompleted</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -61,7 +53,7 @@ new ToDoItemView(5, "Přečíst knihu", "Kapitola 5", true)
 
     private void OrderById()
     {
-        sortedData = sortedData.OrderBy(x => x.Id).ToList();
+        sortedData = sortedData.OrderBy(item => item.Id).ToList();
     }
 
     public void EditItem(ToDoItemView toDoItem)
@@ -70,7 +62,7 @@ new ToDoItemView(5, "Přečíst knihu", "Kapitola 5", true)
     }
     private void OrderByName()
     {
-        sortedData = sortedData.OrderBy(x => x.Name).ToList();
+        sortedData = sortedData.OrderBy(item => x.Name).ToList();
     }
     private void OrderByDescription()
     {
