@@ -34,14 +34,6 @@
 </div>
 
 @code {
-    private List<ToDoItemView> testData = new()
-{
-new ToDoItemView(1, "Nakoupit potraviny", "Mléko, chléb, vejce", false),
-new ToDoItemView(2, "Dokončit projekt", "Implementovat všechny funkce", true),
-new ToDoItemView(3, "Zavolat mamince", "Domluvit víkend", false),
-new ToDoItemView(4, "Cvičit", "Běhání v parku", false),
-new ToDoItemView(5, "Přečíst knihu", "Kapitola 5", true)
-};
 
     private List<ToDoItemView> sortedData = new();
 
@@ -62,15 +54,15 @@ new ToDoItemView(5, "Přečíst knihu", "Kapitola 5", true)
     }
     private void OrderByName()
     {
-        sortedData = sortedData.OrderBy(item => x.Name).ToList();
+        sortedData = sortedData.OrderBy(item => item.Name).ToList();
     }
     private void OrderByDescription()
     {
-        sortedData = sortedData.OrderBy(x => x.Description).ToList();
+        sortedData = sortedData.OrderBy(item => item.Description).ToList();
     }
 
     private void OrderByIsCompleted()
     {
-        sortedData = sortedData.OrderBy(x => x.IsCompleted).ToList();
+        sortedData = sortedData.OrderBy(item => item.IsCompleted).ToList();
     }
 }
