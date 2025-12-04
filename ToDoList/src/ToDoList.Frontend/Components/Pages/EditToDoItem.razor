@@ -1,0 +1,26 @@
+@page "/editToDoItem/{ItemId:int}"
+@using ToDoList.Frontend.Clients
+@using ToDoList.Frontend.Models
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+<b>@ItemId</b>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+    [Parameter]
+    public int ItemId { get; set; }
+
+    [SupplyParameterFromForm]
+    public ToDoItemView TodoItemModel { get; set; }
+
+    public async Task Submit()
+    {
+        await Task.Delay(millisecondsDelay: 500);
+    }
+}

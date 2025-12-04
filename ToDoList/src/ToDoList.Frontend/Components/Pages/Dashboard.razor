@@ -3,37 +3,38 @@
 @using System.Linq
 
 @inject IToDoItemsClient toDoItemsClient
+@inject NavigationManager NavigationManager
 
 <div class="container mt-4">
-    <h2 class="mb-3">Dashboard</h2>
+    <h2 class="mb-3">ToDo items dashboard</h2>
 
-    <table class="table table-striped table-hover">
-        <thead class="table-light">
+    <table class="table table-hover mt-3">
+        <thead class="table-dark">
             <tr>
                 <th>
-                    <button @onclick="OrderById" class="btn btn-sm btn-outline-primary w-100">ID</button>
+                    <button class="btn btn-secondary" @onclick="OrderById">Sort by Id</button>
                 </th>
                 <th>
-                    <button @onclick="OrderByName" class="btn btn-sm btn-outline-primary w-100">Name</button>
+                    <button class="btn btn-primary" @onclick="OrderByName">Sort by Name</button>
                 </th>
                 <th>
-                    <button @onclick="OrderByDescription"
-                        class="btn btn-sm btn-outline-primary w-100">Description</button>
+                    <button class="btn btn-primary" @onclick="OrderByDescription">Sort by Description</button>
                 </th>
                 <th>
-                    <button @onclick="OrderByIsCompleted"
-                        class="btn btn-sm btn-outline-primary w-100">Completed</button>
+                    <button class="btn btn-primary" @onclick="OrderByIsCompleted">Sort by Completed</button>
                 </th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in sortedData)
             {
-                <tr>
+                <tr class="table-light">
                     <td>@item.Id</td>
                     <td>@item.Name</td>
                     <td>@item.Description</td>
                     <td>@(item.IsCompleted ? "Ano" : "Ne")</td>
+                    <td><button class="btn btn success" @onclick="() => EditItem(item)">Edit</button></td>
                 </tr>
             }
         </tbody>
@@ -63,6 +64,10 @@ new ToDoItemView(5, "Přečíst knihu", "Kapitola 5", true)
         sortedData = sortedData.OrderBy(x => x.Id).ToList();
     }
 
+    public void EditItem(ToDoItemView toDoItem)
+    {
+        NavigationManager.NavigateTo(uri: $"/editToDoItem/{toDoItem.Id}");
+    }
     private void OrderByName()
     {
         sortedData = sortedData.OrderBy(x => x.Name).ToList();
