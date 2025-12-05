@@ -1,7 +1,6 @@
 ﻿namespace ToDoList.Persistence;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using ToDoList.Domain.Models;
 
 public class ToDoItemsContext : DbContext

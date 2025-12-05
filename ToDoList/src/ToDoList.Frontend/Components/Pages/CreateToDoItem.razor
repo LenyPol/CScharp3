@@ -1,49 +1,46 @@
-@page "/editToDoItem/{ItemId:int}"
+@page "/addToDoItem"
 @using ToDoList.Frontend.Clients
 @using ToDoList.Frontend.Models
-@inject NavigationManager NavigationManager
 @inject IToDoItemsClient toDoItemsClient
+@inject NavigationManager NavigationManager
 
 @rendermode InteractiveServer
 
 @if (ToDoItemModel is not null)
 {
-    <EditForm Model="ToDoItemModel" FormName="EditToDoItem" OnSubmit="Submit">
+    <EditForm Model="ToDoItemModel" FormName="CreateToDoItem" OnSubmit="Submit">
         <div class="mb-3">
             <label for="Name" class="form-label fw-bold">Name</label>
             <InputText id="Name" @bind-Value="ToDoItemModel.Name" class="form-control rounded-pill px-3" />
         </div>
+
         <div class="mb-3">
             <label for="Description" class="form-label fw-bold">Description</label>
             <InputText id="Description" @bind-Value="ToDoItemModel.Description" class="form-control rounded-pill px-3" />
         </div>
+
         <div class="mb-3">
             <label for="Category" class="form-label fw-bold">Category</label>
             <InputText id="Category" @bind-Value="ToDoItemModel.Category" class="form-control rounded-pill px-3" />
         </div>
+
         <div class="form-check mb-4">
             <InputCheckbox id="IsCompleted" @bind-Value="ToDoItemModel.IsCompleted" class="form-check-input" />
             <label for="IsCompleted" class="form-check-label ms-2 fw-bold">Is Completed?</label>
         </div>
-        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Odeslat</button>
+
+        <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">
+            Create
+        </button>
     </EditForm>
 }
 
 @code {
-    protected override async Task OnInitializedAsync()
+    public ToDoItemView ToDoItemModel { get; set; } = new();
+
+    private async Task Submit()
     {
-        ToDoItemModel = await toDoItemsClient.ReadItemByIdAsync(ItemId) ?? new ToDoItemView(); ;
-    }
-
-    [Parameter]
-    public int ItemId { get; set; }
-
-    [SupplyParameterFromForm]
-    public ToDoItemView? ToDoItemModel { get; set; }
-
-    public async Task Submit()
-    {
-        await toDoItemsClient.UpdateItemAsync(ToDoItemModel!);
+        await toDoItemsClient.CreateItemAsync(ToDoItemModel);
         NavigationManager.NavigateTo("/");
     }
 }
