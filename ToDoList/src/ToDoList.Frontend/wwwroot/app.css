@@ -38,3 +38,38 @@ h1:focus {
 .form-floating>.form-control:focus::placeholder {
   text-align: start;
 }
+
+table.table tbody tr:hover {
+  background-color: #e8eef5;
+}
+
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+  --bs-table-accent-bg: #f4f5f7;
+}
+
+.table-header-custom th {
+  background-color: #599ef3 !important;
+  color: #2c4064 !important;
+}
+
+.sort-btn {
+  font-weight: 700 !important;
+  color: #1c334d !important;
+  border-color: #1c334d !important;
+}
+
+
+.sort-btn:hover {
+  background-color: #599ef3 !important;
+  color: white !important;
+  border-color: #1c334d !important;
+}
+
+.form-card {
+  border-radius: 15px;
+}
+
+.form-control {
+  height: 45px;
+}

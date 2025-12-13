@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 using System.Linq;
-using ToDoList.Persistence;
-using Microsoft.EntityFrameworkCore;
 using ToDoList.Persistence.Repositories;
 
 /// <summary>
@@ -20,9 +18,7 @@ public class ToDoItemsController : ControllerBase
     private readonly IRepositoryAsync<ToDoItem> repository;
 
     public ToDoItemsController(IRepositoryAsync<ToDoItem> repository)
-    {
-        this.repository = repository;
-    }
+        => this.repository = repository;
     /// <summary>
     /// Vytvoří nový ToDoItem na základě dat z požadavku.
     /// </summary>

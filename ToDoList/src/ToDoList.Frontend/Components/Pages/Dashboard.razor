@@ -8,13 +8,16 @@
 <div class="container mt-4">
     <h2 class="mb-3">ToDo items dashboard</h2>
 
-    <table class="table table-hover mt-3">
-        <thead class="table-dark">
+    <table class="table table-striped table-hover table-bordered shadow-sm rounded">
+        <thead class="table-header-custom">
             <tr>
-                <th><button class="btn btn-secondary" @onclick="OrderById">Sort by Id</button></th>
-                <th><button class="btn btn-primary" @onclick="OrderByName">Sort by Name</button></th>
+                <th><button class="btn btn-outline-primary sort-btn rounded-pill px-4" @onclick="OrderById">Sort by
+                        Id</button></th>
+                <th><button class="btn btn-outline-primary sort-btn rounded-pill px-4" @onclick="OrderByName">Sort by
+                        Name</button></th>
                 <th>Description</th>
                 <th>IsCompleted</th>
+                <th>Category</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -26,7 +29,17 @@
                     <td>@item.Name</td>
                     <td>@item.Description</td>
                     <td>@(item.IsCompleted ? "Ano" : "Ne")</td>
-                    <td><button class="btn btn success" @onclick="() => EditItem(item)">Edit</button></td>
+                    <td>@item.Category</td>
+                    <td><button class="btn btn-outline-primary btn-sm rounded-circle bi bi-pencil"
+                            @onclick="() => EditItem(item)"></button>
+                        <button class="btn btn-outline-danger btn-sm rounded-circle bi bi-trash"
+                            @onclick="() => DeleteItem(item.Id)"></button>
+                        <button class="btn btn-outline-success btn-sm rounded-circle"
+                            @onclick="() => ToggleCompleted(item)">
+                            <i class="bi @(item.IsCompleted ? "bi-arrow-counterclockwise" : "bi-check")"></i></button>
+                        <button class="btn btn-outline-info btn-sm rounded-circle bi bi-plus-lg"
+                            @onclick="() => AddNewItem()"></button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -41,6 +54,15 @@
     {
         //sortedData = testData.ToList();
         sortedData = await toDoItemsClient.ReadItemsAsync();
+    }
+    private async Task DeleteItem(int id)
+    {
+        var deletedItem = await toDoItemsClient.DeleteItemAsync(id);
+
+        if (deletedItem != null)
+        {
+            sortedData.RemoveAll(item => item.Id == deletedItem.Id);
+        }
     }
 
     private void OrderById()
@@ -64,5 +86,19 @@
     private void OrderByIsCompleted()
     {
         sortedData = sortedData.OrderBy(item => item.IsCompleted).ToList();
+    }
+    private void OrderByCategory()
+    {
+        sortedData = sortedData.OrderBy(item => item.Category).ToList();
+    }
+    private async Task ToggleCompleted(ToDoItemView item)
+    {
+        item.IsCompleted = !item.IsCompleted;
+        await toDoItemsClient.UpdateItemAsync(item);
+        StateHasChanged();
+    }
+    private void AddNewItem()
+    {
+        NavigationManager.NavigateTo("/addToDoItem");
     }
 }
